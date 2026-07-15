@@ -2,13 +2,22 @@
 
 A full-stack task/project tracker built with **React (Vite)**, **Express**, and **MongoDB**.
 
-- Role-based auth (Admin / Employee) with JWT
+- Role-based auth (**Admin / Manager / Employee**) with JWT
 - Admin dashboard: create users, create & assign tasks, edit/delete anything
+- **Manager role**: fully manage tasks for their own reports (create, assign, edit, delete, view team stats) — but no access to user management or projects
 - Employee dashboard: see assigned tasks, update task status
+- **Projects & Milestones**: tasks belong to real Project records, each with its own milestones
+- **Kanban board**: drag-and-drop cards between status columns
+- **Calendar view**: task deadlines and project milestones plotted by day
+- **Comments & activity log**: every task has a unified timeline of system events (created, status changes, edits) plus threaded comments
+- **Live time tracking**: start/stop a timer on any task; it keeps running and stays visible in the sidebar across every page, even after a refresh
 - Task statuses: `todo`, `in-progress`, `delivered`, `cancelled`, `hold`
+- **Task Completion donut chart**: pending vs. completed tasks at a glance on the Overview page, with a total-task count underneath
 - Every task shows **days remaining** until its deadline
 - **Deadline Watch**: a dedicated view (and overview widget) listing every open task
   with **3 days or fewer** remaining
+- **Daily email reminders**: every employee with an approaching deadline gets an automated email at 10am
+- Responsive UI (mobile sidebar drawer, scrollable tables) with hover/press feedback on every button
 
 ---
 
@@ -39,6 +48,12 @@ npm run seed   # creates the first admin account from your .env values
 npm run dev    # starts the API on http://localhost:5000 (nodemon, auto-restarts)
 # or: npm start
 ```
+
+**If you're upgrading an existing database** (one that already has tasks created before Projects & Milestones existed), run this once to convert old free-text project names into real Project records:
+```bash
+npm run migrate:projects
+```
+This is safe to run more than once — it skips anything already migrated.
 
 Health check: `GET http://localhost:5000/api/health`
 
@@ -89,16 +104,18 @@ frontend/
 
 ## Permissions summary
 
-| Action                          | Admin | Employee |
-|----------------------------------|:-----:|:--------:|
-| Log in                           | ✅    | ✅       |
-| View own assigned tasks          | ✅    | ✅       |
-| View all tasks                   | ✅    | ❌       |
-| Create / assign tasks            | ✅    | ❌       |
-| Edit task details / reassign     | ✅    | ❌       |
-| Update status of own tasks       | ✅    | ✅       |
-| Delete tasks                     | ✅    | ❌       |
-| Create / edit / delete users     | ✅    | ❌       |
+| Action                          | Admin | Manager | Employee |
+|----------------------------------|:-----:|:-------:|:--------:|
+| Log in                           | ✅    | ✅      | ✅       |
+| View own assigned tasks          | ✅    | ✅      | ✅       |
+| View all tasks / their team's tasks | ✅ (all) | ✅ (own team) | ❌ |
+| Create / assign tasks            | ✅    | ✅ (own team only) | ❌ |
+| Edit task details / reassign     | ✅    | ✅ (own team only) | ❌ |
+| Update status of own tasks       | ✅    | ✅      | ✅       |
+| Delete tasks                     | ✅    | ✅ (own team only) | ❌ |
+| View team stats / Employee Stats | ✅ (everyone) | ✅ (own team) | ❌ |
+| Create / manage projects & milestones | ✅ | ❌ | ❌ |
+| Create / edit / delete users     | ✅    | ❌      | ❌       |
 
 ## Notes
 

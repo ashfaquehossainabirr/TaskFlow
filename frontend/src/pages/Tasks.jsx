@@ -6,16 +6,18 @@ import TaskDetailModal from '../components/TaskDetailModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { STATUS_LABELS } from '../utils/deadline';
+import { canManageTasks } from '../utils/roles';
 
 export default function Tasks() {
   const { user } = useAuth();
-  const isAdmin = user.role === 'admin';
+  const isManager = canManageTasks(user.role);
 
   const [tasks, setTasks] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
-  const [search, setSearch] = useState('');
+  const [projectFilter, setProjectFilter] = useState('');
 
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -26,7 +28,7 @@ export default function Tasks() {
     try {
       const params = {};
       if (statusFilter) params.status = statusFilter;
-      if (search) params.projectName = search;
+      if (projectFilter) params.project = projectFilter;
       const res = await api.get('/tasks', { params });
       setTasks(res.data);
     } finally {
@@ -35,20 +37,26 @@ export default function Tasks() {
   };
 
   const loadEmployees = async () => {
-    if (!isAdmin) return;
+    if (!isManager) return;
     const res = await api.get('/users', { params: { role: 'employee' } });
     setEmployees(res.data);
   };
 
+  const loadProjects = async () => {
+    const res = await api.get('/projects');
+    setProjects(res.data);
+  };
+
   useEffect(() => {
     loadEmployees();
+    loadProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const t = setTimeout(loadTasks, 250);
-    return () => clearTimeout(t);
+    loadTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, search]);
+  }, [statusFilter, projectFilter]);
 
   const handleStatusChange = async (task, status) => {
     const prev = tasks;
@@ -81,10 +89,10 @@ export default function Tasks() {
 
   return (
     <PageShell
-      title={isAdmin ? 'All Tasks' : 'My Tasks'}
-      subtitle={isAdmin ? 'Create, assign, and track every task across the team.' : 'Update the status of tasks assigned to you.'}
+      title={isManager ? 'All Tasks' : 'My Tasks'}
+      subtitle={isManager ? 'Create, assign, and track every task across the team.' : 'Update the status of tasks assigned to you.'}
       actions={
-        isAdmin && (
+        isManager && (
           <button
             onClick={() => {
               setEditingTask(null);
@@ -107,10 +115,9 @@ export default function Tasks() {
       }
     >
       <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
-        <input
-          placeholder="Search by project name…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+        <select
+          value={projectFilter}
+          onChange={(e) => setProjectFilter(e.target.value)}
           style={{
             background: 'var(--bg-inset)',
             border: '1px solid var(--border-hairline)',
@@ -118,9 +125,16 @@ export default function Tasks() {
             padding: '9px 12px',
             fontSize: 13.5,
             color: 'var(--text-primary)',
-            minWidth: 220,
+            minWidth: 200,
           }}
-        />
+        >
+          <option value="">All projects</option>
+          {projects.map((p) => (
+            <option key={p._id} value={p._id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
@@ -144,7 +158,7 @@ export default function Tasks() {
 
       <TaskTable
         tasks={tasks}
-        isAdmin={isAdmin}
+        isAdmin={isManager}
         onStatusChange={handleStatusChange}
         onEdit={(task) => {
           setEditingTask(task);
@@ -159,6 +173,7 @@ export default function Tasks() {
         <TaskFormModal
           task={editingTask}
           employees={employees}
+          projects={projects}
           onClose={() => setShowForm(false)}
           onSaved={() => {
             setShowForm(false);

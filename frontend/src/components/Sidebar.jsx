@@ -1,6 +1,9 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import ActiveTimerBar from './ActiveTimerBar';
+import Modal from './Modal';
+import { canManageTasks } from '../utils/roles';
 
 const linkStyle = ({ isActive }) => ({
   display: 'flex',
@@ -21,6 +24,8 @@ export default function Sidebar({ isOpen, onClose }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const isAdmin = user?.role === 'admin';
+  const isManager = canManageTasks(user?.role);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   // Auto-close the mobile drawer whenever the user navigates to a new page.
   useEffect(() => {
@@ -65,8 +70,17 @@ export default function Sidebar({ isOpen, onClose }) {
           <NavLink to="/" end style={linkStyle}>
             Overview
           </NavLink>
+          <NavLink to="/projects" style={linkStyle}>
+            Projects
+          </NavLink>
           <NavLink to="/tasks" style={linkStyle}>
-            {isAdmin ? 'All Tasks' : 'My Tasks'}
+            {isManager ? 'All Tasks' : 'My Tasks'}
+          </NavLink>
+          <NavLink to="/kanban" style={linkStyle}>
+            Kanban Board
+          </NavLink>
+          <NavLink to="/calendar" style={linkStyle}>
+            Calendar
           </NavLink>
           <NavLink to="/deadlines" style={linkStyle}>
             Deadline Watch
@@ -76,21 +90,27 @@ export default function Sidebar({ isOpen, onClose }) {
               Team &amp; Access
             </NavLink>
           )}
-          {isAdmin && (
+          {isManager && (
             <NavLink to="/employee-stats" style={linkStyle}>
-              Employee Stats
+              {isAdmin ? 'Employee Stats' : 'My Team'}
             </NavLink>
           )}
         </nav>
 
         <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid var(--border-hairline-soft)' }}>
+          <ActiveTimerBar />
           <div style={{ padding: '8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{user?.name}</span>
             <span
               className="mono"
               style={{
                 fontSize: 11,
-                color: user?.role === 'admin' ? 'var(--accent-cyan)' : 'var(--text-muted)',
+                color:
+                  user?.role === 'admin'
+                    ? 'var(--accent-cyan)'
+                    : user?.role === 'manager'
+                    ? 'var(--status-hold)'
+                    : 'var(--text-muted)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.06em',
               }}
@@ -99,7 +119,7 @@ export default function Sidebar({ isOpen, onClose }) {
             </span>
           </div>
           <button
-            onClick={logout}
+            onClick={() => setShowLogoutConfirm(true)}
             style={{
               width: '100%',
               marginTop: 8,
@@ -117,6 +137,46 @@ export default function Sidebar({ isOpen, onClose }) {
           </button>
         </div>
       </aside>
+
+      {showLogoutConfirm && (
+        <Modal title="Sign out?" onClose={() => setShowLogoutConfirm(false)} width={360}>
+          <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: 0, marginBottom: 20 }}>
+            You'll need to log back in with your email and password to continue.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <button
+              onClick={() => setShowLogoutConfirm(false)}
+              style={{
+                background: 'transparent',
+                color: 'var(--text-secondary)',
+                border: '1px solid var(--border-hairline)',
+                borderRadius: 8,
+                padding: '9px 16px',
+                fontSize: 13.5,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={logout}
+              style={{
+                background: 'var(--status-cancelled)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                padding: '9px 16px',
+                fontSize: 13.5,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Sign out
+            </button>
+          </div>
+        </Modal>
+      )}
 
       <style>{`
         .sidebar {

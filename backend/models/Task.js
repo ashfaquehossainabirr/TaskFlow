@@ -14,10 +14,14 @@ const taskSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
-    projectName: {
-      type: String,
-      required: [true, 'Project name is required'],
-      trim: true,
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Project',
+      required: [true, 'Task must belong to a project'],
+    },
+    milestone: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
     },
     status: {
       type: String,
@@ -56,6 +60,7 @@ const taskSchema = new mongoose.Schema(
 
 taskSchema.index({ assignedTo: 1, status: 1 });
 taskSchema.index({ deadline: 1 });
+taskSchema.index({ project: 1 });
 
 taskSchema.statics.STATUS_VALUES = STATUS_VALUES;
 

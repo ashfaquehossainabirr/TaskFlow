@@ -1,7 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PageShell from '../components/PageShell';
 import UserFormModal from '../components/UserFormModal';
 import api from '../api/axios';
+
+const ROLE_COLORS = {
+  admin: 'var(--accent-cyan)',
+  manager: 'var(--status-hold)',
+  employee: 'var(--text-secondary)',
+};
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -22,6 +28,15 @@ export default function Users() {
   useEffect(() => {
     load();
   }, []);
+
+  const managers = useMemo(() => users.filter((u) => u.role === 'manager'), [users]);
+  const managerNameById = useMemo(() => {
+    const map = {};
+    managers.forEach((m) => {
+      map[m._id] = m.name;
+    });
+    return map;
+  }, [managers]);
 
   const handleSubmit = async (form, userId) => {
     if (userId) {
@@ -44,7 +59,7 @@ export default function Users() {
   return (
     <PageShell
       title="Team & Access"
-      subtitle="Create admin and employee accounts, and manage who can log in."
+      subtitle="Create admin, manager, and employee accounts, and manage who can log in."
       actions={
         <button
           onClick={() => {
@@ -75,10 +90,10 @@ export default function Users() {
         }}
       >
         <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', minWidth: 640, borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', minWidth: 720, borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              {['Name', 'Email', 'Role', 'Department', 'Status', ''].map((h) => (
+              {['Name', 'Email', 'Role', 'Reports to', 'Department', 'Status', ''].map((h) => (
                 <th
                   key={h}
                   style={{
@@ -100,7 +115,7 @@ export default function Users() {
           <tbody>
             {!loading && users.length === 0 && (
               <tr>
-                <td colSpan={6} style={{ padding: '40px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <td colSpan={7} style={{ padding: '40px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
                   No users yet.
                 </td>
               </tr>
@@ -118,12 +133,13 @@ export default function Users() {
                       fontWeight: 700,
                       textTransform: 'uppercase',
                       letterSpacing: '0.04em',
-                      color: u.role === 'admin' ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                      color: ROLE_COLORS[u.role] || 'var(--text-secondary)',
                     }}
                   >
                     {u.role}
                   </span>
                 </td>
+                <td style={tdStyle}>{u.role === 'employee' ? managerNameById[u.manager] || '—' : '—'}</td>
                 <td style={tdStyle}>{u.department || '—'}</td>
                 <td style={tdStyle}>
                   <span
@@ -162,6 +178,7 @@ export default function Users() {
       {showForm && (
         <UserFormModal
           user={editingUser}
+          managers={managers}
           onClose={() => setShowForm(false)}
           onSaved={() => {
             setShowForm(false);

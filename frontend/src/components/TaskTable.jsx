@@ -104,7 +104,7 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
                       border: '1px solid var(--border-hairline)',
                     }}
                   >
-                    {task.projectName}
+                    {task.project?.name || '—'}
                   </span>
                 </td>
                 {isAdmin && (

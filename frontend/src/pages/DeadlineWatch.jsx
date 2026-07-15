@@ -4,10 +4,11 @@ import TaskTable from '../components/TaskTable';
 import TaskDetailModal from '../components/TaskDetailModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
+import { canManageTasks } from '../utils/roles';
 
 export default function DeadlineWatch() {
   const { user } = useAuth();
-  const isAdmin = user.role === 'admin';
+  const isAdmin = canManageTasks(user.role);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [detailTaskId, setDetailTaskId] = useState(null);

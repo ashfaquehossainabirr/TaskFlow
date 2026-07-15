@@ -6,9 +6,11 @@ const MINI_STATS = [
   { key: 'cancelled', label: 'Cancelled', color: 'var(--status-cancelled)' },
 ];
 
-export default function EmployeeStatCard({ employee }) {
+export default function EmployeeStatCard({ employee, onClick }) {
   return (
     <div
+      onClick={onClick}
+      className="employee-stat-card"
       style={{
         background: 'var(--bg-panel)',
         border: '1px solid var(--border-hairline-soft)',
@@ -18,6 +20,7 @@ export default function EmployeeStatCard({ employee }) {
         flexDirection: 'column',
         gap: 16,
         minWidth: 0,
+        cursor: onClick ? 'pointer' : 'default',
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
@@ -90,6 +93,17 @@ export default function EmployeeStatCard({ employee }) {
       <div style={{ fontSize: 11.5, color: 'var(--text-muted)', textAlign: 'right', borderTop: '1px solid var(--border-hairline-soft)', paddingTop: 10 }}>
         <span className="mono">{employee.total}</span> task{employee.total === 1 ? '' : 's'} total
       </div>
+
+      <style>{`
+        .employee-stat-card {
+          transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+        }
+        .employee-stat-card:hover {
+          transform: translateY(-2px);
+          border-color: var(--border-hairline);
+          background: var(--bg-panel-raised);
+        }
+      `}</style>
     </div>
   );
 }

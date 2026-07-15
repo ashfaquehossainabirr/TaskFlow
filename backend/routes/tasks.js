@@ -1,33 +1,90 @@
 const express = require('express');
 const Task = require('../models/Task');
 const User = require('../models/User');
+const Activity = require('../models/Activity');
 const { protect, authorize } = require('../middleware/auth');
 const { runDeadlineReminderJob } = require('../jobs/deadlineReminderJob');
+const { getTeamMemberIds, isTeamMember } = require('../utils/teamAccess');
 
 const router = express.Router();
 
 router.use(protect);
 
-// Scopes the task query to the requester: admins see everything,
-// employees only ever see tasks assigned to them.
-const scopeToUser = (req) => {
+const STATUS_LABELS = {
+  todo: 'To Do',
+  'in-progress': 'In Progress',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+  hold: 'On Hold',
+};
+
+// Scopes a task query to what the requester is allowed to see:
+//   admin    -> everything
+//   manager  -> tasks assigned to anyone on their team
+//   employee -> only their own tasks
+const scopeToUser = async (req) => {
   if (req.user.role === 'admin') return {};
+  if (req.user.role === 'manager') {
+    const teamIds = await getTeamMemberIds(req.user._id);
+    return { assignedTo: { $in: teamIds } };
+  }
   return { assignedTo: req.user._id };
 };
 
+// Confirms the requester can view/comment on a specific task: the admin,
+// the task's own assignee, or the assignee's manager.
+// task.assignedTo may be a raw ObjectId OR a populated user document
+// (e.g. GET /:id populates it before this runs) - always resolve to a plain
+// id string before comparing, otherwise a populated object stringifies to
+// "[object Object]" and never matches, silently locking the assignee out of
+// their own task.
+const canAccessTask = async (req, task) => {
+  if (req.user.role === 'admin') return true;
+  const assignedToId = String(task.assignedTo?._id ?? task.assignedTo ?? '');
+  if (assignedToId === String(req.user._id)) return true;
+  if (req.user.role === 'manager') return isTeamMember(req.user._id, assignedToId);
+  return false;
+};
+
+// Confirms the requester is allowed to create/edit/delete/reassign a task
+// pointed at `employeeId` - the admin, or that employee's manager.
+const canManageAssignee = async (req, employeeId) => {
+  if (req.user.role === 'admin') return true;
+  if (req.user.role === 'manager') return isTeamMember(req.user._id, employeeId);
+  return false;
+};
+
+// Writes one entry to a task's activity timeline. Never throws - a logging
+// failure shouldn't ever break the actual task operation that triggered it.
+async function logActivity(taskId, userId, type, message, text = '') {
+  try {
+    await Activity.create({ task: taskId, user: userId, type, message, text });
+  } catch (err) {
+    console.error('Failed to log activity:', err.message);
+  }
+}
+
 // @route   GET /api/tasks
-// @desc    List tasks. Admins see all, employees see only their own.
-//          Supports optional ?status=, ?assignedTo=, ?projectName= filters.
+// @desc    List tasks. Admins see all, managers see their team's, employees see only their own.
+//          Supports optional ?status=, ?assignedTo=, ?project= filters.
 router.get('/', async (req, res) => {
   try {
-    const filter = scopeToUser(req);
+    const filter = await scopeToUser(req);
     if (req.query.status) filter.status = req.query.status;
-    if (req.query.assignedTo && req.user.role === 'admin') filter.assignedTo = req.query.assignedTo;
-    if (req.query.projectName) filter.projectName = new RegExp(req.query.projectName, 'i');
+    if (req.query.assignedTo && req.user.role !== 'employee') {
+      if (req.user.role === 'manager' && !(await isTeamMember(req.user._id, req.query.assignedTo))) {
+        return res.status(403).json({ message: 'You can only view tasks for your own team' });
+      }
+      // Safe to narrow down to this one person now - admins can query anyone,
+      // and we've just confirmed a manager may only query their own team.
+      filter.assignedTo = req.query.assignedTo;
+    }
+    if (req.query.project) filter.project = req.query.project;
 
     const tasks = await Task.find(filter)
       .populate('assignedTo', 'name email department')
       .populate('createdBy', 'name email')
+      .populate('project', 'name status milestones')
       .sort({ deadline: 1 });
 
     res.json(tasks);
@@ -40,7 +97,7 @@ router.get('/', async (req, res) => {
 // @desc    Counts of tasks per status, scoped to the requester
 router.get('/stats', async (req, res) => {
   try {
-    const filter = scopeToUser(req);
+    const filter = await scopeToUser(req);
     const statuses = Task.STATUS_VALUES;
 
     const counts = await Task.aggregate([
@@ -75,20 +132,27 @@ router.post('/reminders/send-now', authorize('admin'), async (req, res) => {
 });
 
 // @route   GET /api/tasks/stats/by-employee
-// @desc    Per-employee breakdown: distinct project count + count per status. Admin only.
-router.get('/stats/by-employee', authorize('admin'), async (req, res) => {
+// @desc    Per-employee breakdown: distinct project count + count per status.
+//          Admin sees everyone; a manager sees only their own team.
+router.get('/stats/by-employee', authorize('admin', 'manager'), async (req, res) => {
   try {
-    const employees = await User.find({ role: 'employee' }).select('name email department').sort({ name: 1 });
+    const employeeFilter = { role: 'employee' };
+    if (req.user.role === 'manager') employeeFilter.manager = req.user._id;
+
+    const employees = await User.find(employeeFilter).select('name email department').sort({ name: 1 });
+    const employeeIds = employees.map((e) => e._id);
 
     const statusAgg = await Task.aggregate([
+      { $match: { assignedTo: { $in: employeeIds } } },
       { $group: { _id: { employee: '$assignedTo', status: '$status' }, count: { $sum: 1 } } },
     ]);
 
     const projectAgg = await Task.aggregate([
+      { $match: { assignedTo: { $in: employeeIds } } },
       {
         $group: {
           _id: '$assignedTo',
-          projects: { $addToSet: '$projectName' },
+          projects: { $addToSet: '$project' },
           total: { $sum: 1 },
         },
       },
@@ -135,7 +199,7 @@ router.get('/stats/by-employee', authorize('admin'), async (req, res) => {
 // @desc    Tasks with 3 or fewer days remaining until deadline (not yet delivered/cancelled)
 router.get('/deadlines/upcoming', async (req, res) => {
   try {
-    const filter = scopeToUser(req);
+    const filter = await scopeToUser(req);
     const now = new Date();
     const threeDaysOut = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
 
@@ -144,6 +208,7 @@ router.get('/deadlines/upcoming', async (req, res) => {
 
     const tasks = await Task.find(filter)
       .populate('assignedTo', 'name email department')
+      .populate('project', 'name status milestones')
       .sort({ deadline: 1 });
 
     res.json(tasks);
@@ -158,11 +223,12 @@ router.get('/:id', async (req, res) => {
     const task = await Task.findById(req.params.id)
       .populate('assignedTo', 'name email department')
       .populate('createdBy', 'name email')
+      .populate('project', 'name status milestones')
       .populate('statusHistory.changedBy', 'name');
 
     if (!task) return res.status(404).json({ message: 'Task not found' });
 
-    if (req.user.role !== 'admin' && String(task.assignedTo._id) !== String(req.user._id)) {
+    if (!(await canAccessTask(req, task))) {
       return res.status(403).json({ message: 'You do not have access to this task' });
     }
 
@@ -172,22 +238,95 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// @route   POST /api/tasks
-// @desc    Create and assign a task to an employee. Admin only.
-router.post('/', authorize('admin'), async (req, res) => {
+// @route   GET /api/tasks/:id/activity
+// @desc    Full activity timeline for a task (system events + comments), oldest first.
+router.get('/:id/activity', async (req, res) => {
   try {
-    const { title, description, projectName, priority, deadline, assignedTo, status } = req.body;
+    const task = await Task.findById(req.params.id).select('assignedTo');
+    if (!task) return res.status(404).json({ message: 'Task not found' });
+    if (!(await canAccessTask(req, task))) {
+      return res.status(403).json({ message: 'You do not have access to this task' });
+    }
 
-    if (!title || !projectName || !deadline || !assignedTo) {
+    const activity = await Activity.find({ task: req.params.id })
+      .populate('user', 'name role')
+      .sort({ createdAt: 1 });
+
+    res.json(activity);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch activity', error: err.message });
+  }
+});
+
+// @route   POST /api/tasks/:id/comments
+// @desc    Add a comment to a task. Admin, the assigned employee, or their manager.
+router.post('/:id/comments', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || !text.trim()) {
+      return res.status(400).json({ message: 'Comment text is required' });
+    }
+
+    const task = await Task.findById(req.params.id).select('assignedTo');
+    if (!task) return res.status(404).json({ message: 'Task not found' });
+    if (!(await canAccessTask(req, task))) {
+      return res.status(403).json({ message: 'You do not have access to this task' });
+    }
+
+    const comment = await Activity.create({
+      task: req.params.id,
+      user: req.user._id,
+      type: 'comment',
+      text: text.trim(),
+    });
+
+    const populated = await comment.populate('user', 'name role');
+    res.status(201).json(populated);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to add comment', error: err.message });
+  }
+});
+
+// @route   DELETE /api/tasks/:id/comments/:commentId
+// @desc    Delete a comment. The comment's own author, or an admin, only.
+router.delete('/:id/comments/:commentId', async (req, res) => {
+  try {
+    const comment = await Activity.findOne({ _id: req.params.commentId, task: req.params.id, type: 'comment' });
+    if (!comment) return res.status(404).json({ message: 'Comment not found' });
+
+    if (req.user.role !== 'admin' && String(comment.user) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'You can only delete your own comments' });
+    }
+
+    await comment.deleteOne();
+    res.json({ message: 'Comment deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete comment', error: err.message });
+  }
+});
+
+// @route   POST /api/tasks
+// @desc    Create and assign a task. Admin can assign to anyone; a manager
+//          can only assign to someone on their own team.
+router.post('/', authorize('admin', 'manager'), async (req, res) => {
+  try {
+    const { title, description, project, milestone, priority, deadline, assignedTo, status } = req.body;
+
+    if (!title || !project || !deadline || !assignedTo) {
       return res.status(400).json({
-        message: 'title, projectName, deadline and assignedTo are required',
+        message: 'title, project, deadline and assignedTo are required',
       });
+    }
+
+    if (!(await canManageAssignee(req, assignedTo))) {
+      return res.status(403).json({ message: 'You can only assign tasks to your own team' });
     }
 
     const task = await Task.create({
       title,
       description,
-      projectName,
+      project,
+      milestone: milestone || null,
       priority,
       deadline,
       assignedTo,
@@ -196,7 +335,12 @@ router.post('/', authorize('admin'), async (req, res) => {
       statusHistory: [{ status: status || 'todo', changedBy: req.user._id }],
     });
 
-    const populated = await task.populate('assignedTo', 'name email department');
+    await logActivity(task._id, req.user._id, 'created', 'created this task');
+
+    const populated = await task.populate([
+      { path: 'assignedTo', select: 'name email department' },
+      { path: 'project', select: 'name status milestones' },
+    ]);
     res.status(201).json(populated);
   } catch (err) {
     res.status(500).json({ message: 'Failed to create task', error: err.message });
@@ -204,26 +348,79 @@ router.post('/', authorize('admin'), async (req, res) => {
 });
 
 // @route   PUT /api/tasks/:id
-// @desc    Full update of a task's details (title, project, deadline, assignment, etc). Admin only.
-router.put('/:id', authorize('admin'), async (req, res) => {
+// @desc    Full update of a task's details. Admin can edit any task; a
+//          manager can only edit tasks belonging to their own team, and can
+//          only reassign within their own team.
+router.put('/:id', authorize('admin', 'manager'), async (req, res) => {
   try {
-    const { title, description, projectName, priority, deadline, assignedTo, status } = req.body;
+    const { title, description, project, milestone, priority, deadline, assignedTo, status } = req.body;
     const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ message: 'Task not found' });
 
-    if (title !== undefined) task.title = title;
-    if (description !== undefined) task.description = description;
-    if (projectName !== undefined) task.projectName = projectName;
-    if (priority !== undefined) task.priority = priority;
-    if (deadline !== undefined) task.deadline = deadline;
-    if (assignedTo !== undefined) task.assignedTo = assignedTo;
+    if (!(await canManageAssignee(req, task.assignedTo))) {
+      return res.status(403).json({ message: 'You can only manage tasks belonging to your own team' });
+    }
+    if (assignedTo !== undefined && String(assignedTo) !== String(task.assignedTo)) {
+      if (!(await canManageAssignee(req, assignedTo))) {
+        return res.status(403).json({ message: 'You can only reassign tasks to your own team' });
+      }
+    }
+
+    const changedFields = [];
+    if (title !== undefined && title !== task.title) {
+      task.title = title;
+      changedFields.push('title');
+    }
+    if (description !== undefined && description !== task.description) {
+      task.description = description;
+      changedFields.push('description');
+    }
+    if (project !== undefined && String(project) !== String(task.project)) {
+      task.project = project;
+      changedFields.push('project');
+    }
+    if (milestone !== undefined && String(milestone || '') !== String(task.milestone || '')) {
+      task.milestone = milestone || null;
+      changedFields.push('milestone');
+    }
+    if (priority !== undefined && priority !== task.priority) {
+      task.priority = priority;
+      changedFields.push('priority');
+    }
+    if (deadline !== undefined && new Date(deadline).getTime() !== new Date(task.deadline).getTime()) {
+      task.deadline = deadline;
+      changedFields.push('deadline');
+    }
+    if (assignedTo !== undefined && String(assignedTo) !== String(task.assignedTo)) {
+      task.assignedTo = assignedTo;
+      changedFields.push('assignee');
+    }
+
+    let statusChangedTo = null;
     if (status !== undefined && status !== task.status) {
+      statusChangedTo = status;
       task.status = status;
       task.statusHistory.push({ status, changedBy: req.user._id });
     }
 
     await task.save();
-    const populated = await task.populate('assignedTo', 'name email department');
+
+    if (changedFields.length > 0) {
+      await logActivity(task._id, req.user._id, 'updated', `updated ${changedFields.join(', ')}`);
+    }
+    if (statusChangedTo) {
+      await logActivity(
+        task._id,
+        req.user._id,
+        'status_changed',
+        `changed status to ${STATUS_LABELS[statusChangedTo] || statusChangedTo}`
+      );
+    }
+
+    const populated = await task.populate([
+      { path: 'assignedTo', select: 'name email department' },
+      { path: 'project', select: 'name status milestones' },
+    ]);
     res.json(populated);
   } catch (err) {
     res.status(500).json({ message: 'Failed to update task', error: err.message });
@@ -232,7 +429,8 @@ router.put('/:id', authorize('admin'), async (req, res) => {
 
 // @route   PATCH /api/tasks/:id/status
 // @desc    Update only the status of a task. Admin can update any task,
-//          employees can only update the status of tasks assigned to them.
+//          a manager can update any task on their team, employees can only
+//          update the status of tasks assigned to them.
 router.patch('/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
@@ -243,15 +441,20 @@ router.patch('/:id/status', async (req, res) => {
     const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ message: 'Task not found' });
 
-    if (req.user.role !== 'admin' && String(task.assignedTo) !== String(req.user._id)) {
-      return res.status(403).json({ message: 'You can only update tasks assigned to you' });
+    if (!(await canAccessTask(req, task))) {
+      return res.status(403).json({ message: 'You can only update tasks assigned to you or your team' });
     }
 
     task.status = status;
     task.statusHistory.push({ status, changedBy: req.user._id });
     await task.save();
 
-    const populated = await task.populate('assignedTo', 'name email department');
+    await logActivity(task._id, req.user._id, 'status_changed', `changed status to ${STATUS_LABELS[status] || status}`);
+
+    const populated = await task.populate([
+      { path: 'assignedTo', select: 'name email department' },
+      { path: 'project', select: 'name status milestones' },
+    ]);
     res.json(populated);
   } catch (err) {
     res.status(500).json({ message: 'Failed to update task status', error: err.message });
@@ -259,11 +462,19 @@ router.patch('/:id/status', async (req, res) => {
 });
 
 // @route   DELETE /api/tasks/:id
-// @desc    Delete a task. Admin only.
-router.delete('/:id', authorize('admin'), async (req, res) => {
+// @desc    Delete a task. Admin can delete any task; a manager can only
+//          delete tasks belonging to their own team.
+router.delete('/:id', authorize('admin', 'manager'), async (req, res) => {
   try {
-    const task = await Task.findByIdAndDelete(req.params.id);
+    const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ message: 'Task not found' });
+
+    if (!(await canManageAssignee(req, task.assignedTo))) {
+      return res.status(403).json({ message: 'You can only delete tasks belonging to your own team' });
+    }
+
+    await task.deleteOne();
+    await Activity.deleteMany({ task: req.params.id });
     res.json({ message: 'Task deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Failed to delete task', error: err.message });

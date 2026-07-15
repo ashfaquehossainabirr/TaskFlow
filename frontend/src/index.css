@@ -45,9 +45,9 @@ body {
   margin: 0;
   overflow-x: hidden;
   background: var(--bg-void);
-  background-image:
+  /* background-image:
     radial-gradient(circle at 10% 0%, rgba(79, 216, 224, 0.06), transparent 40%),
-    radial-gradient(circle at 90% 100%, rgba(74, 158, 255, 0.05), transparent 45%);
+    radial-gradient(circle at 90% 100%, rgba(74, 158, 255, 0.05), transparent 45%); */
   color: var(--text-primary);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
@@ -60,6 +60,26 @@ a {
 
 button {
   font-family: inherit;
+}
+
+/* Universal button hover/press feedback. Works regardless of a button's own
+   inline background color since brightness()/transform don't depend on it -
+   this is what covers every button across the app without editing each one. */
+button:not(:disabled) {
+  transition: filter 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+button:not(:disabled):hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+button:not(:disabled):active {
+  filter: brightness(0.92);
+  transform: translateY(0);
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.65;
 }
 
 ::selection {

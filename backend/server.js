@@ -8,6 +8,8 @@ const { runDeadlineReminderJob } = require('./jobs/deadlineReminderJob');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const taskRoutes = require('./routes/tasks');
+const projectRoutes = require('./routes/projects');
+const timeEntryRoutes = require('./routes/timeEntries');
 
 const app = express();
 
@@ -32,6 +34,8 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/time-entries', timeEntryRoutes);
 
 // External-trigger endpoint for services like cron-job.org. It is NOT behind
 // the normal login system (no JWT needed) — instead it checks a shared secret

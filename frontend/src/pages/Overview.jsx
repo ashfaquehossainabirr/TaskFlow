@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import StatsCards from '../components/StatsCards';
+import TaskCompletionDonut from '../components/TaskCompletionDonut';
 import TaskTable from '../components/TaskTable';
 import TaskDetailModal from '../components/TaskDetailModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
+import { canManageTasks } from '../utils/roles';
 
 export default function Overview() {
   const { user } = useAuth();
-  const isAdmin = user.role === 'admin';
+  const isManager = canManageTasks(user.role);
   const [stats, setStats] = useState(null);
   const [urgentTasks, setUrgentTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,9 +38,13 @@ export default function Overview() {
   return (
     <PageShell
       title={`Welcome back, ${user.name.split(' ')[0]}`}
-      subtitle={isAdmin ? "Here's how the team's work is tracking today." : "Here's what's on your plate today."}
+      subtitle={isManager ? "Here's how the team's work is tracking today." : "Here's what's on your plate today."}
     >
       <StatsCards stats={stats} loading={loading} />
+
+      <div style={{ marginBottom: 28 }}>
+        <TaskCompletionDonut stats={stats} loading={loading} />
+      </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, margin: 0 }}>

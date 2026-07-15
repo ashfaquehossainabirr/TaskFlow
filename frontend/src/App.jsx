@@ -5,6 +5,10 @@ import Tasks from './pages/Tasks';
 import DeadlineWatch from './pages/DeadlineWatch';
 import Users from './pages/Users';
 import EmployeeStats from './pages/EmployeeStats';
+import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
+import KanbanBoard from './pages/KanbanBoard';
+import CalendarView from './pages/CalendarView';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -28,6 +32,38 @@ export default function App() {
         }
       />
       <Route
+        path="/projects"
+        element={
+          <ProtectedRoute>
+            <Projects />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/projects/:id"
+        element={
+          <ProtectedRoute>
+            <ProjectDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/kanban"
+        element={
+          <ProtectedRoute>
+            <KanbanBoard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/calendar"
+        element={
+          <ProtectedRoute>
+            <CalendarView />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/deadlines"
         element={
           <ProtectedRoute>
@@ -46,7 +82,7 @@ export default function App() {
       <Route
         path="/employee-stats"
         element={
-          <ProtectedRoute adminOnly>
+          <ProtectedRoute allowedRoles={['admin', 'manager']}>
             <EmployeeStats />
           </ProtectedRoute>
         }
