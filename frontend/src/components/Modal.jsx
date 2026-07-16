@@ -5,7 +5,7 @@ export default function Modal({ title, onClose, children, width = 480 }) {
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(6, 9, 13, 0.65)',
+        background: 'var(--overlay-scrim)',
         backdropFilter: 'blur(2px)',
         display: 'flex',
         alignItems: 'center',

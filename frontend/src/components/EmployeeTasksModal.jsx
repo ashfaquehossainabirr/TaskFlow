@@ -59,7 +59,7 @@ export default function EmployeeTasksModal({ employee, onClose }) {
           style={{
             background: 'rgba(239, 100, 97, 0.1)',
             border: '1px solid rgba(239, 100, 97, 0.35)',
-            color: '#ff8a85',
+            color: 'var(--text-error)',
             padding: '10px 12px',
             borderRadius: 8,
             fontSize: 13,

@@ -9,8 +9,8 @@ import { daysRemaining } from '../utils/deadline';
 import { formatStopwatch, formatDurationShort } from '../utils/time';
 
 const row = { display: 'flex', justifyContent: 'space-between', gap: 16, padding: '11px 0', borderBottom: '1px solid var(--border-hairline-soft)' };
-const rowLabel = { fontSize: 12.5, color: 'var(--text-muted)', fontWeight: 600 };
-const rowValue = { fontSize: 13.5, color: 'var(--text-primary)', textAlign: 'right' };
+const rowLabel = { fontSize: 12.5, color: 'var(--text-muted)', fontWeight: 600, flexShrink: 0 };
+const rowValue = { fontSize: 13.5, color: 'var(--text-primary)', textAlign: 'right', wordBreak: 'break-word', minWidth: 0 };
 
 export default function TaskDetailModal({ taskId, onClose }) {
   const { user } = useAuth();
@@ -146,7 +146,7 @@ export default function TaskDetailModal({ taskId, onClose }) {
           style={{
             background: 'rgba(239, 100, 97, 0.1)',
             border: '1px solid rgba(239, 100, 97, 0.35)',
-            color: '#ff8a85',
+            color: 'var(--text-error)',
             padding: '10px 12px',
             borderRadius: 8,
             fontSize: 13,
@@ -278,7 +278,7 @@ export default function TaskDetailModal({ taskId, onClose }) {
                 style={{
                   background: 'rgba(239, 100, 97, 0.1)',
                   border: '1px solid rgba(239, 100, 97, 0.35)',
-                  color: '#ff8a85',
+                  color: 'var(--text-error)',
                   padding: '8px 10px',
                   borderRadius: 8,
                   fontSize: 12.5,
@@ -410,7 +410,7 @@ export default function TaskDetailModal({ taskId, onClose }) {
                   style={{
                     background: 'rgba(239, 100, 97, 0.1)',
                     border: '1px solid rgba(239, 100, 97, 0.35)',
-                    color: '#ff8a85',
+                    color: 'var(--text-error)',
                     padding: '8px 10px',
                     borderRadius: 8,
                     fontSize: 12.5,

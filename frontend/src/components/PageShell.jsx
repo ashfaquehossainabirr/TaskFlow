@@ -41,7 +41,7 @@ export default function PageShell({ title, subtitle, actions, children }) {
         .page-main {
           flex: 1;
           padding: 32px 40px;
-          max-width: 1640px;
+          max-width: 1920px;
           min-width: 0;
         }
         .page-header {

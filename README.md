@@ -17,6 +17,7 @@ A full-stack task/project tracker built with **React (Vite)**, **Express**, and 
 - **Deadline Watch**: a dedicated view (and overview widget) listing every open task
   with **3 days or fewer** remaining
 - **Daily email reminders**: every employee with an approaching deadline gets an automated email at 10am
+- **Dark / light mode**: toggle in the sidebar (and on the login screen), remembers your choice, and defaults to your OS preference on first visit
 - Responsive UI (mobile sidebar drawer, scrollable tables) with hover/press feedback on every button
 
 ---

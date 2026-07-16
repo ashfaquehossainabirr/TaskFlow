@@ -99,7 +99,7 @@ export default function ProjectDetail() {
           style={{
             background: 'rgba(239, 100, 97, 0.1)',
             border: '1px solid rgba(239, 100, 97, 0.35)',
-            color: '#ff8a85',
+            color: 'var(--text-error)',
             padding: '12px 14px',
             borderRadius: 8,
             fontSize: 13.5,

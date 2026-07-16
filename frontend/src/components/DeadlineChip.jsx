@@ -1,9 +1,9 @@
 import { formatDaysRemaining, urgencyLevel } from '../utils/deadline';
 
 const STYLES = {
-  overdue: { color: '#ff8a85', bg: 'rgba(239, 100, 97, 0.14)', border: 'rgba(239, 100, 97, 0.4)', pulse: true },
-  urgent: { color: '#ffb454', bg: 'rgba(240, 168, 63, 0.14)', border: 'rgba(240, 168, 63, 0.4)', pulse: true },
-  soon: { color: '#7ec8ff', bg: 'rgba(74, 158, 255, 0.1)', border: 'rgba(74, 158, 255, 0.3)', pulse: false },
+  overdue: { color: 'var(--text-error)', bg: 'rgba(239, 100, 97, 0.14)', border: 'rgba(239, 100, 97, 0.4)', pulse: true },
+  urgent: { color: 'var(--text-warning)', bg: 'rgba(240, 168, 63, 0.14)', border: 'rgba(240, 168, 63, 0.4)', pulse: true },
+  soon: { color: 'var(--text-info)', bg: 'rgba(74, 158, 255, 0.1)', border: 'rgba(74, 158, 255, 0.3)', pulse: false },
   normal: { color: 'var(--text-secondary)', bg: 'var(--bg-inset)', border: 'var(--border-hairline)', pulse: false },
   closed: { color: 'var(--text-muted)', bg: 'var(--bg-inset)', border: 'var(--border-hairline-soft)', pulse: false },
 };

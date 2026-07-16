@@ -168,7 +168,7 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
         </div>
 
         {projects.length === 0 && (
-          <div style={{ ...errorBanner, background: 'rgba(240, 168, 63, 0.1)', border: '1px solid rgba(240, 168, 63, 0.3)', color: '#ffb454' }}>
+          <div style={{ ...errorBanner, background: 'rgba(240, 168, 63, 0.1)', border: '1px solid rgba(240, 168, 63, 0.3)', color: 'var(--text-warning)' }}>
             No projects exist yet. Create one from the Projects page first.
           </div>
         )}

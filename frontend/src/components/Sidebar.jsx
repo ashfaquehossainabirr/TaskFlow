@@ -2,6 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ActiveTimerBar from './ActiveTimerBar';
+import ThemeToggle from './ThemeToggle';
 import Modal from './Modal';
 import { canManageTasks } from '../utils/roles';
 
@@ -99,6 +100,9 @@ export default function Sidebar({ isOpen, onClose }) {
 
         <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid var(--border-hairline-soft)' }}>
           <ActiveTimerBar />
+          <div style={{ marginBottom: 10 }}>
+            <ThemeToggle />
+          </div>
           <div style={{ padding: '8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{user?.name}</span>
             <span
@@ -224,7 +228,7 @@ export default function Sidebar({ isOpen, onClose }) {
             display: block;
             position: fixed;
             inset: 0;
-            background: rgba(6, 9, 13, 0.6);
+            background: var(--overlay-scrim);
             z-index: 200;
           }
         }

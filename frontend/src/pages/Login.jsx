@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Login() {
   const { login } = useAuth();
@@ -138,7 +139,10 @@ export default function Login() {
       </div>
 
       {/* Right panel - form */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32, position: 'relative' }}>
+        <div style={{ position: 'absolute', top: 20, right: 20 }}>
+          <ThemeToggle compact />
+        </div>
         <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: 360 }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, marginBottom: 6 }}>
             Sign in
@@ -152,7 +156,7 @@ export default function Login() {
               style={{
                 background: 'rgba(239, 100, 97, 0.1)',
                 border: '1px solid rgba(239, 100, 97, 0.35)',
-                color: '#ff8a85',
+                color: 'var(--text-error)',
                 padding: '10px 12px',
                 borderRadius: 8,
                 fontSize: 13,

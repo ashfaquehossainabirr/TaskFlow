@@ -22,7 +22,7 @@ export default function TaskCompletionDonut({ stats, loading }) {
         alignItems: 'center',
         gap: 16,
         width: '100%',
-        maxWidth: 1640,
+        maxWidth: 1920,
       }}
     >
       <div
