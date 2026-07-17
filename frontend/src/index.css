@@ -181,6 +181,12 @@ a:focus-visible {
   border-color: var(--border-hairline);
 }
 
+@media screen and (max-width: 860px) {
+  .login-left {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
