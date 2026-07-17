@@ -10,7 +10,7 @@ export default function Modal({ title, onClose, children, width = 480 }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 100,
+        zIndex: 999,
         padding: 20,
       }}
     >
