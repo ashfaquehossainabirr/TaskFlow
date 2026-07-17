@@ -5,6 +5,7 @@ import StatsCards from '../components/StatsCards';
 import TaskCompletionDonut from '../components/TaskCompletionDonut';
 import TaskTable from '../components/TaskTable';
 import TaskDetailModal from '../components/TaskDetailModal';
+import NoticeBoard from '../components/NoticeBoard';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { canManageTasks } from '../utils/roles';
@@ -40,6 +41,7 @@ export default function Overview() {
       title={`Welcome back, ${user.name.split(' ')[0]}`}
       subtitle={isManager ? "Here's how the team's work is tracking today." : "Here's what's on your plate today."}
     >
+
       <StatsCards stats={stats} loading={loading} />
 
       <div style={{ marginBottom: 28 }}>
@@ -61,6 +63,10 @@ export default function Overview() {
         onRowClick={(task) => setDetailTaskId(task._id)}
         emptyLabel="Nothing urgent right now — all deadlines are more than 3 days out."
       />
+
+      <div style={{ marginTop: 32 }}>
+        <NoticeBoard />
+      </div>
 
       {detailTaskId && <TaskDetailModal taskId={detailTaskId} onClose={() => setDetailTaskId(null)} />}
     </PageShell>

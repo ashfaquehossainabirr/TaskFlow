@@ -10,6 +10,7 @@ const userRoutes = require('./routes/users');
 const taskRoutes = require('./routes/tasks');
 const projectRoutes = require('./routes/projects');
 const timeEntryRoutes = require('./routes/timeEntries');
+const noticeRoutes = require('./routes/notices');
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/time-entries', timeEntryRoutes);
+app.use('/api/notices', noticeRoutes);
 
 // External-trigger endpoint for services like cron-job.org. It is NOT behind
 // the normal login system (no JWT needed) — instead it checks a shared secret
