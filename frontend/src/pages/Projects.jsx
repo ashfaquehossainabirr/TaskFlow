@@ -105,17 +105,17 @@ export default function Projects() {
               key={p._id}
               onClick={() => navigate(`/projects/${p._id}`)}
               className="project-card"
-              style={{
-                background: 'var(--bg-panel)',
-                border: '1px solid var(--border-hairline-soft)',
-                borderRadius: 'var(--radius-lg)',
-                padding: 18,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 10,
-                minWidth: 0,
-                cursor: 'pointer',
-              }}
+              // style={{
+              //   background: 'var(--bg-panel)',
+              //   border: '1px solid var(--border-hairline-soft)',
+              //   borderRadius: 'var(--radius-lg)',
+              //   padding: 18,
+              //   display: 'flex',
+              //   flexDirection: 'column',
+              //   gap: 10,
+              //   minWidth: 0,
+              //   cursor: 'pointer',
+              // }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
                 <div style={{ fontWeight: 700, fontSize: 15.5, color: 'var(--text-primary)', minWidth: 0 }}>{p.name}</div>
