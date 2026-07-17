@@ -130,7 +130,7 @@ export default function Login() {
       </div>
 
       {/* Right panel - form */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32, position: 'relative' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, position: 'relative' }}>
         <div style={{ position: 'absolute', top: 20, right: 20 }}>
           <ThemeToggle compact />
         </div>
