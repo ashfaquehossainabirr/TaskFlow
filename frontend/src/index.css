@@ -200,15 +200,15 @@ a:focus-visible {
 
 .mobile-logo {
   display: none;
-  align-items: center; 
-  gap: 10;
-  position: relative;
-  margin-bottom: 24px;
 }
 
 @media screen and (max-width: 860px) {
   .mobile-logo {
     display: flex;
+    align-items: center; 
+    gap: 10;
+    position: relative;
+    margin-bottom: 24px;
   }
   .login-wrapper {
     grid-template-columns: 1fr;
