@@ -29,11 +29,12 @@ export default function Login() {
 
   return (
     <div
-      style={{
-        minHeight: '100vh',
-        display: 'grid',
-        gridTemplateColumns: '1.1fr 1fr',
-      }}
+      // style={{
+      //   minHeight: '100vh',
+      //   display: 'grid',
+      //   gridTemplateColumns: '1.1fr 1fr',
+      // }}
+      className="login-wrapper"
     >
       {/* Left panel - brand / signature */}
       <div

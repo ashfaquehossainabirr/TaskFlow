@@ -181,6 +181,12 @@ a:focus-visible {
   border-color: var(--border-hairline);
 }
 
+.login-wrapper {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+}
+
 .login-left {
   background: var(--bg-panel);
   border-right: 1px solid var(--border-hairline-soft);
@@ -193,6 +199,9 @@ a:focus-visible {
 }
 
 @media screen and (max-width: 860px) {
+  .login-wrapper {
+    grid-template-columns: 1fr;
+  }
   .login-left {
     display: none;
   }
