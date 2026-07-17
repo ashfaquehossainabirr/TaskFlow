@@ -134,6 +134,25 @@ export default function Login() {
         <div style={{ position: 'absolute', top: 20, right: 20 }}>
           <ThemeToggle compact />
         </div>
+        <div className="mobile-logo">
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              background: 'linear-gradient(135deg, var(--accent-cyan), var(--status-progress))',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: 'var(--font-mono)',
+              fontWeight: 700,
+              color: '#0b1017',
+            }}
+          >
+            T
+          </div>
+          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 19 }}>TaskFlow</span>
+        </div>
         <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: 360 }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, marginBottom: 6 }}>
             Sign in
