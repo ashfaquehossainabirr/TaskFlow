@@ -181,6 +181,17 @@ a:focus-visible {
   border-color: var(--border-hairline);
 }
 
+.login-left {
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-hairline-soft);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 56px;
+  position: relative;
+  overflow: hidden;
+}
+
 @media screen and (max-width: 860px) {
   .login-left {
     display: none;

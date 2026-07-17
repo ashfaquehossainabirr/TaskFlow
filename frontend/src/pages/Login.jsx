@@ -37,16 +37,6 @@ export default function Login() {
     >
       {/* Left panel - brand / signature */}
       <div
-        style={{
-          background: 'var(--bg-panel)',
-          borderRight: '1px solid var(--border-hairline-soft)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          padding: '48px 56px',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
         className="login-left"
       >
         <div
