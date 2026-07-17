@@ -6,6 +6,7 @@ import TaskCompletionDonut from '../components/TaskCompletionDonut';
 import TaskTable from '../components/TaskTable';
 import TaskDetailModal from '../components/TaskDetailModal';
 import NoticeBoard from '../components/NoticeBoard';
+import StatusTasksModal from '../components/StatusTasksModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { canManageTasks } from '../utils/roles';
@@ -17,6 +18,7 @@ export default function Overview() {
   const [urgentTasks, setUrgentTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [detailTaskId, setDetailTaskId] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
 
   const load = async () => {
     setLoading(true);
@@ -42,7 +44,11 @@ export default function Overview() {
       subtitle={isManager ? "Here's how the team's work is tracking today." : "Here's what's on your plate today."}
     >
 
-      <StatsCards stats={stats} loading={loading} />
+      <StatsCards
+        stats={stats}
+        loading={loading}
+        onCardClick={(statusKey, statusLabel) => setSelectedStatus({ key: statusKey, label: statusLabel })}
+      />
 
       <div style={{ marginBottom: 28 }}>
         <TaskCompletionDonut stats={stats} loading={loading} />
@@ -64,11 +70,19 @@ export default function Overview() {
         emptyLabel="Nothing urgent right now — all deadlines are more than 3 days out."
       />
 
-      <div style={{ marginTop: 32 }}>
+      <div className="notice-board" style={{ marginTop: 28 }}>
         <NoticeBoard />
       </div>
 
       {detailTaskId && <TaskDetailModal taskId={detailTaskId} onClose={() => setDetailTaskId(null)} />}
+
+      {selectedStatus && (
+        <StatusTasksModal
+          status={selectedStatus.key}
+          statusLabel={selectedStatus.label}
+          onClose={() => setSelectedStatus(null)}
+        />
+      )}
     </PageShell>
   );
 }

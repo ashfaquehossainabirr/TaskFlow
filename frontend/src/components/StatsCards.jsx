@@ -6,7 +6,7 @@ const CARDS = [
   { key: 'cancelled', label: 'Cancelled', color: 'var(--status-cancelled)' },
 ];
 
-export default function StatsCards({ stats, loading }) {
+export default function StatsCards({ stats, loading, onCardClick }) {
   return (
     <div
       style={{
@@ -42,6 +42,7 @@ export default function StatsCards({ stats, loading }) {
         <div
           key={c.key}
           className="stat-card"
+          onClick={() => onCardClick && onCardClick(c.key, c.label)}
           style={{
             background: 'var(--bg-panel)',
             border: '1px solid var(--border-hairline-soft)',
@@ -49,7 +50,7 @@ export default function StatsCards({ stats, loading }) {
             padding: '18px 18px 16px',
             position: 'relative',
             overflow: 'hidden',
-            cursor: 'default',
+            cursor: onCardClick ? 'pointer' : 'default',
             '--glow': c.color,
           }}
         >
