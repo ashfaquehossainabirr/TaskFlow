@@ -469,7 +469,13 @@ router.patch('/:id/status', async (req, res) => {
 router.delete('/:id', authorize('admin', 'manager'), async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
-    if (!task) return res.status(404).json({ message: 'Task not found' });
+    if (!task) {
+      // Already gone - e.g. a retried request after a dropped connection, or
+      // deleted from another tab/session. The end state the caller wants
+      // (this task no longer existing) is already true, so this is a
+      // success, not an error.
+      return res.json({ message: 'Task already deleted' });
+    }
 
     if (!(await canManageAssignee(req, task.assignedTo))) {
       return res.status(403).json({ message: 'You can only delete tasks belonging to your own team' });

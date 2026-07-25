@@ -23,7 +23,7 @@ const tdStyle = {
   verticalAlign: 'middle',
 };
 
-export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDelete, onRowClick, emptyLabel }) {
+export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDelete, deletingId, onRowClick, emptyLabel }) {
   if (!tasks || tasks.length === 0) {
     return (
       <div
@@ -150,8 +150,17 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
                       <button onClick={() => onEdit(task)} style={iconBtnStyle}>
                         Edit
                       </button>
-                      <button onClick={() => onDelete(task)} style={{ ...iconBtnStyle, color: 'var(--status-cancelled)' }}>
-                        Delete
+                      <button
+                        onClick={() => onDelete(task)}
+                        disabled={deletingId === task._id}
+                        style={{
+                          ...iconBtnStyle,
+                          color: 'var(--status-cancelled)',
+                          opacity: deletingId === task._id ? 0.6 : 1,
+                          cursor: deletingId === task._id ? 'default' : 'pointer',
+                        }}
+                      >
+                        {deletingId === task._id ? 'Deleting…' : 'Delete'}
                       </button>
                     </div>
                   </td>

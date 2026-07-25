@@ -25,6 +25,7 @@ export default function Tasks() {
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [detailTaskId, setDetailTaskId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const loadTasks = async () => {
     setLoading(true);
@@ -83,11 +84,26 @@ export default function Tasks() {
 
   const handleDelete = async (task) => {
     if (!window.confirm(`Delete "${task.title}"? This cannot be undone.`)) return;
+    setDeletingId(task._id);
     try {
       await api.delete(`/tasks/${task._id}`);
       setTasks((ts) => ts.filter((t) => t._id !== task._id));
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete task');
+      // A request can fail (timeout, dropped connection) even after the
+      // server already deleted the task. Re-sync with the server instead of
+      // trusting the failed response, so the list doesn't show a stale row
+      // or a false "failed" alert for something that actually succeeded.
+      const stillExists = await api
+        .get(`/tasks/${task._id}`)
+        .then(() => true)
+        .catch((checkErr) => checkErr.response?.status !== 404);
+      if (stillExists) {
+        alert(err.response?.data?.message || 'Failed to delete task');
+      } else {
+        setTasks((ts) => ts.filter((t) => t._id !== task._id));
+      }
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -185,6 +201,7 @@ export default function Tasks() {
           setShowForm(true);
         }}
         onDelete={handleDelete}
+        deletingId={deletingId}
         onRowClick={(task) => setDetailTaskId(task._id)}
         emptyLabel={loading ? 'Loading tasks…' : 'No tasks match your filters.'}
       />
