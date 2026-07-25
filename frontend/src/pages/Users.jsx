@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import PageShell from '../components/PageShell';
 import UserFormModal from '../components/UserFormModal';
 import api from '../api/axios';
+import useDebounce from '../hooks/useDebounce';
 
 const ROLE_COLORS = {
   admin: 'var(--accent-cyan)',
@@ -14,11 +15,15 @@ export default function Users() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
 
   const load = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/users');
+      const params = {};
+      if (debouncedSearch) params.search = debouncedSearch;
+      const res = await api.get('/users', { params });
       setUsers(res.data);
     } finally {
       setLoading(false);
@@ -27,7 +32,8 @@ export default function Users() {
 
   useEffect(() => {
     load();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
 
   const managers = useMemo(() => users.filter((u) => u.role === 'manager'), [users]);
   const managerNameById = useMemo(() => {
@@ -81,6 +87,24 @@ export default function Users() {
         </button>
       }
     >
+      <div style={{ marginBottom: 16 }}>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name or email…"
+          style={{
+            background: 'var(--bg-inset)',
+            border: '1px solid var(--border-hairline)',
+            borderRadius: 8,
+            padding: '9px 12px',
+            fontSize: 13.5,
+            color: 'var(--text-primary)',
+            minWidth: 260,
+          }}
+        />
+      </div>
+
       <div
         style={{
           background: 'var(--bg-panel)',
@@ -116,7 +140,7 @@ export default function Users() {
             {!loading && users.length === 0 && (
               <tr>
                 <td colSpan={7} style={{ padding: '40px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                  No users yet.
+                  {search ? 'No users match your search.' : 'No users yet.'}
                 </td>
               </tr>
             )}

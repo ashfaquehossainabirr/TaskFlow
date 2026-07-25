@@ -163,6 +163,8 @@ a:focus-visible {
   letter-spacing: -0.01em;
 }
 
+/* Other Pages Styles */
+
 .project-card {
   background: var(--bg-panel);
   border: 1px solid var(--border-hairline-soft);

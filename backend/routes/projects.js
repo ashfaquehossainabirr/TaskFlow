@@ -3,6 +3,7 @@ const Project = require('../models/Project');
 const Task = require('../models/Task');
 const { protect, authorize } = require('../middleware/auth');
 const { getTeamMemberIds } = require('../utils/teamAccess');
+const { escapeRegex } = require('../utils/escapeRegex');
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router.get('/', async (req, res) => {
   try {
     const filter = {};
     if (req.query.status) filter.status = req.query.status;
+    if (req.query.search) filter.name = { $regex: escapeRegex(req.query.search), $options: 'i' };
     const projects = await Project.find(filter).sort({ createdAt: -1 });
     res.json(projects);
   } catch (err) {

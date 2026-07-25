@@ -5,6 +5,7 @@ const Activity = require('../models/Activity');
 const { protect, authorize } = require('../middleware/auth');
 const { runDeadlineReminderJob } = require('../jobs/deadlineReminderJob');
 const { getTeamMemberIds, isTeamMember } = require('../utils/teamAccess');
+const { escapeRegex } = require('../utils/escapeRegex');
 
 const router = express.Router();
 
@@ -80,6 +81,7 @@ router.get('/', async (req, res) => {
       filter.assignedTo = req.query.assignedTo;
     }
     if (req.query.project) filter.project = req.query.project;
+    if (req.query.search) filter.title = { $regex: escapeRegex(req.query.search), $options: 'i' };
 
     const tasks = await Task.find(filter)
       .populate('assignedTo', 'name email department')

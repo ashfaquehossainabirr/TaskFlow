@@ -2,6 +2,7 @@ const express = require('express');
 const User = require('../models/User');
 const Task = require('../models/Task');
 const { protect, authorize } = require('../middleware/auth');
+const { escapeRegex } = require('../utils/escapeRegex');
 
 const router = express.Router();
 
@@ -23,6 +24,10 @@ router.get('/', async (req, res) => {
     if (req.query.role) filter.role = req.query.role;
     if (req.user.role === 'manager') {
       filter.manager = req.user._id;
+    }
+    if (req.query.search) {
+      const re = new RegExp(escapeRegex(req.query.search), 'i');
+      filter.$or = [{ name: re }, { email: re }];
     }
 
     const users = await User.find(filter).sort({ createdAt: -1 });

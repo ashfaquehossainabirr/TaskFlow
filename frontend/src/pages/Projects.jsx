@@ -5,6 +5,7 @@ import ProjectFormModal from '../components/ProjectFormModal';
 import { ProjectStatusBadge } from '../components/ProjectStatusBadge';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
+import useDebounce from '../hooks/useDebounce';
 
 export default function Projects() {
   const { user } = useAuth();
@@ -15,11 +16,15 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
 
   const load = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/projects');
+      const params = {};
+      if (debouncedSearch) params.search = debouncedSearch;
+      const res = await api.get('/projects', { params });
       setProjects(res.data);
     } finally {
       setLoading(false);
@@ -28,7 +33,8 @@ export default function Projects() {
 
   useEffect(() => {
     load();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
 
   const handleSubmit = async (form, projectId) => {
     if (projectId) {
@@ -75,6 +81,24 @@ export default function Projects() {
         )
       }
     >
+      <div style={{ marginBottom: 16 }}>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search projects by name…"
+          style={{
+            background: 'var(--bg-inset)',
+            border: '1px solid var(--border-hairline)',
+            borderRadius: 8,
+            padding: '9px 12px',
+            fontSize: 13.5,
+            color: 'var(--text-primary)',
+            minWidth: 260,
+          }}
+        />
+      </div>
+
       {loading && <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>Loading projects…</div>}
 
       {!loading && projects.length === 0 && (
@@ -88,7 +112,9 @@ export default function Projects() {
             fontSize: 14,
           }}
         >
-          No projects yet.{isAdmin ? ' Create one to start assigning tasks.' : ''}
+          {search ? 'No projects match your search.' : (
+            <>No projects yet.{isAdmin ? ' Create one to start assigning tasks.' : ''}</>
+          )}
         </div>
       )}
 

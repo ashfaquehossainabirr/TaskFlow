@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { STATUS_LABELS } from '../utils/deadline';
 import { canManageTasks } from '../utils/roles';
+import useDebounce from '../hooks/useDebounce';
 
 export default function Tasks() {
   const { user } = useAuth();
@@ -18,6 +19,8 @@ export default function Tasks() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [projectFilter, setProjectFilter] = useState('');
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
 
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -29,6 +32,7 @@ export default function Tasks() {
       const params = {};
       if (statusFilter) params.status = statusFilter;
       if (projectFilter) params.project = projectFilter;
+      if (debouncedSearch) params.search = debouncedSearch;
       const res = await api.get('/tasks', { params });
       setTasks(res.data);
     } finally {
@@ -56,7 +60,7 @@ export default function Tasks() {
   useEffect(() => {
     loadTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, projectFilter]);
+  }, [statusFilter, projectFilter, debouncedSearch]);
 
   const handleStatusChange = async (task, status) => {
     const prev = tasks;
@@ -115,6 +119,22 @@ export default function Tasks() {
       }
     >
       <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search tasks by title…"
+          style={{
+            background: 'var(--bg-inset)',
+            border: '1px solid var(--border-hairline)',
+            borderRadius: 8,
+            padding: '9px 12px',
+            fontSize: 13.5,
+            color: 'var(--text-primary)',
+            minWidth: 220,
+            flex: '1 1 220px',
+          }}
+        />
         <select
           value={projectFilter}
           onChange={(e) => setProjectFilter(e.target.value)}
