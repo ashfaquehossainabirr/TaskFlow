@@ -27,6 +27,13 @@ const userSchema = new mongoose.Schema(
       enum: ['admin', 'manager', 'employee'],
       default: 'employee',
     },
+    // The single "root" admin account. Only this user can create/delete other
+    // admin accounts and change another admin's password - regular admins
+    // manage managers/employees but can't touch each other's admin access.
+    isMainAdmin: {
+      type: Boolean,
+      default: false,
+    },
     // Who this person reports to. Only meaningful for employees (an employee
     // reports to one manager); managers/admins leave this null.
     // A manager can fully manage tasks for everyone whose `manager` points
@@ -67,6 +74,7 @@ userSchema.methods.toSafeObject = function toSafeObject() {
     name: this.name,
     email: this.email,
     role: this.role,
+    isMainAdmin: this.isMainAdmin,
     manager: this.manager,
     department: this.department,
     isActive: this.isActive,

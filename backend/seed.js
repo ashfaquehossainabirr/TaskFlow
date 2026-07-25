@@ -20,12 +20,14 @@ const run = async () => {
     email,
     password: process.env.SEED_ADMIN_PASSWORD || 'Admin@12345',
     role: 'admin',
+    isMainAdmin: true,
   });
 
   console.log('Admin account created:');
   console.log(`  Email:    ${admin.email}`);
   console.log(`  Password: ${process.env.SEED_ADMIN_PASSWORD || 'Admin@12345'}`);
-  console.log('Log in and change this password by creating a new admin or updating this one.');
+  console.log('This account is the main admin - it is the only account that can create/delete');
+  console.log('other admins or change another admin\'s password. Log in and change this password.');
   process.exit(0);
 };
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import PageShell from '../components/PageShell';
 import UserFormModal from '../components/UserFormModal';
+import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
 
@@ -11,11 +12,13 @@ const ROLE_COLORS = {
 };
 
 export default function Users() {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [search, setSearch] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
   const debouncedSearch = useDebounce(search, 400);
 
   const load = async () => {
@@ -52,13 +55,36 @@ export default function Users() {
     }
   };
 
+  // Mirrors the backend rule in utils/userPermissions.js: only the main admin
+  // can delete another admin, and the main admin account can never be deleted.
+  const canDeleteUser = (target) => {
+    if (target.isMainAdmin) return false;
+    if (target.role !== 'admin') return true;
+    return Boolean(currentUser.isMainAdmin);
+  };
+
   const handleDelete = async (u) => {
     if (!window.confirm(`Delete ${u.name}? This cannot be undone.`)) return;
+    setDeletingId(u._id);
     try {
       await api.delete(`/users/${u._id}`);
       setUsers((list) => list.filter((x) => x._id !== u._id));
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete user');
+      // A request can fail (timeout, dropped connection) even after the
+      // server already deleted the user. Re-sync with the server instead of
+      // trusting the failed response, so the list doesn't show a stale row
+      // or a false "failed" alert for something that actually succeeded.
+      const stillExists = await api
+        .get('/users', { params: { search: u.email } })
+        .then((res) => res.data.some((x) => x._id === u._id))
+        .catch(() => true);
+      if (stillExists) {
+        alert(err.response?.data?.message || 'Failed to delete user');
+      } else {
+        setUsers((list) => list.filter((x) => x._id !== u._id));
+      }
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -162,6 +188,21 @@ export default function Users() {
                   >
                     {u.role}
                   </span>
+                  {u.isMainAdmin && (
+                    <span
+                      style={{
+                        marginLeft: 6,
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        borderRadius: 4,
+                        background: 'var(--accent-cyan)',
+                        color: '#0b1017',
+                      }}
+                    >
+                      MAIN
+                    </span>
+                  )}
                 </td>
                 <td style={tdStyle}>{u.role === 'employee' ? managerNameById[u.manager] || '—' : '—'}</td>
                 <td style={tdStyle}>{u.department || '—'}</td>
@@ -187,9 +228,32 @@ export default function Users() {
                     >
                       Edit
                     </button>
-                    <button onClick={() => handleDelete(u)} style={{ ...iconBtnStyle, color: 'var(--status-cancelled)' }}>
-                      Delete
-                    </button>
+                    {canDeleteUser(u) ? (
+                      <button
+                        onClick={() => handleDelete(u)}
+                        disabled={deletingId === u._id}
+                        style={{
+                          ...iconBtnStyle,
+                          color: 'var(--status-cancelled)',
+                          opacity: deletingId === u._id ? 0.6 : 1,
+                          cursor: deletingId === u._id ? 'default' : 'pointer',
+                        }}
+                      >
+                        {deletingId === u._id ? 'Deleting…' : 'Delete'}
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        title={
+                          u.isMainAdmin
+                            ? 'The main admin account cannot be deleted'
+                            : 'Only the main admin can delete another admin account'
+                        }
+                        style={{ ...iconBtnStyle, opacity: 0.4, cursor: 'not-allowed' }}
+                      >
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -203,6 +267,7 @@ export default function Users() {
         <UserFormModal
           user={editingUser}
           managers={managers}
+          currentUser={currentUser}
           onClose={() => setShowForm(false)}
           onSaved={() => {
             setShowForm(false);
