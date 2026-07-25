@@ -107,7 +107,7 @@ export default function NoticeBoard() {
       )}
 
       {!loading && !error && notices.length > 0 && (
-        <div className="notice-list">
+        <div className="notice-list" style={{ maxHeight: "410px", overflowY: 'auto', paddingRight: "6px" }}>
           {notices.map((n) => {
             const style = PRIORITY_STYLES[n.priority] || PRIORITY_STYLES.normal;
             return (

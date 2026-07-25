@@ -31,7 +31,7 @@ export default function StatusTasksModal({ status, statusLabel, onClose }) {
   }, [status]);
 
   return (
-    <Modal title={`${statusLabel} tasks`} onClose={onClose} width={780}>
+    <Modal title={`${statusLabel} tasks`} onClose={onClose} width={800}>
       {loading && <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>Loading tasks…</div>}
 
       {error && (

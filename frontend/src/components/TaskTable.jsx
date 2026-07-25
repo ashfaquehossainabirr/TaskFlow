@@ -48,14 +48,16 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
         border: '1px solid var(--border-hairline-soft)',
         borderRadius: 'var(--radius-lg)',
         overflow: 'hidden',
+        padding: '10px',
       }}
     >
       <style>{`
-        .task-row:hover { background: var(--bg-panel-raised); }
+        .task-row:hover td .taskTitle { color: var(--accent-cyan); transition: color 0.2s ease; }
+        .task-row:hover td .projectName { color: var(--accent-cyan) !important; transition: color 0.2s ease; }
       `}</style>
-      <div style={{ overflowX: 'auto' }}>
+      <div style={{ overflowX: 'auto', maxHeight: "500px", overflowY: 'auto', paddingRight: "6px", paddingBottom: "6px" }}>
         <table style={{ width: '100%', minWidth: 720, borderCollapse: 'collapse' }}>
-          <thead>
+          <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: 'var(--bg-panel)', paddingTop: "6px" }}>
             <tr>
               <th style={thStyle}>Task</th>
               <th style={thStyle}>Project</th>
@@ -75,7 +77,7 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
                 className={onRowClick ? 'task-row' : undefined}
               >
                 <td style={tdStyle}>
-                  <div style={{ fontWeight: 600 }}>{task.title}</div>
+                  <div style={{ fontWeight: 600 }} className='taskTitle'>{task.title}</div>
                   {task.description && (
                     <div
                       style={{
@@ -94,7 +96,7 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
                 </td>
                 <td style={tdStyle}>
                   <span
-                    className="mono"
+                    className="mono projectName"
                     style={{
                       fontSize: 12.5,
                       color: 'var(--text-secondary)',

@@ -63,12 +63,14 @@ export default function Overview() {
         </Link>
       </div>
 
-      <TaskTable
-        tasks={urgentTasks}
-        isAdmin={false}
-        onRowClick={(task) => setDetailTaskId(task._id)}
-        emptyLabel="Nothing urgent right now — all deadlines are more than 3 days out."
-      />
+      <div className="deadlines">
+        <TaskTable
+          tasks={urgentTasks}
+          isAdmin={false}
+          onRowClick={(task) => setDetailTaskId(task._id)}
+          emptyLabel="Nothing urgent right now — all deadlines are more than 3 days out."
+        />
+      </div>
 
       <div className="notice-board" style={{ marginTop: 28 }}>
         <NoticeBoard />

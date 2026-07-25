@@ -137,11 +137,12 @@ export default function Users() {
           border: '1px solid var(--border-hairline-soft)',
           borderRadius: 'var(--radius-lg)',
           overflow: 'hidden',
+          padding: '10px',
         }}
       >
-        <div style={{ overflowX: 'auto' }}>
+        <div style={{ overflowX: 'auto', maxHeight: "470px", overflowY: 'auto', paddingRight: "6px" }}>
         <table style={{ width: '100%', minWidth: 720, borderCollapse: 'collapse' }}>
-          <thead>
+          <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: 'var(--bg-panel)', paddingTop: "6px" }}>
             <tr>
               {['Name', 'Email', 'Role', 'Reports to', 'Department', 'Status', ''].map((h) => (
                 <th

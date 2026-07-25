@@ -154,8 +154,13 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--accent-cyan);
-  outline-offset: 2px;
+  outline: none;
+}
+
+input:focus-visible,
+textarea:focus-visible {
+  transition: box-shadow 0.2s ease;
+  box-shadow: 0 0 0 2px var(--accent-cyan);
 }
 
 .mono {
