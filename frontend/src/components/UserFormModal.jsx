@@ -22,6 +22,7 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
     role: user?.role || 'employee',
     department: user?.department || '',
     manager: user?.manager || '',
+    minimumTarget: user?.minimumTarget ?? '',
     isActive: user?.isActive ?? true,
     makeMainAdmin: false,
   });
@@ -32,9 +33,9 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
     setForm((f) => ({
       ...f,
       [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
-      // Manager assignment only makes sense for employees - clear it out
-      // the moment the role changes to anything else.
-      ...(key === 'role' && e.target.value !== 'employee' ? { manager: '' } : {}),
+      // Manager assignment and target only make sense for employees - clear
+      // them out the moment the role changes to anything else.
+      ...(key === 'role' && e.target.value !== 'employee' ? { manager: '', minimumTarget: '' } : {}),
     }));
 
   const handleSubmit = async (e) => {
@@ -46,7 +47,12 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
     }
     setSaving(true);
     try {
-      const payload = { ...form, manager: form.role === 'employee' ? form.manager || null : null };
+      const payload = {
+        ...form,
+        manager: form.role === 'employee' ? form.manager || null : null,
+        minimumTarget:
+          form.role === 'employee' && form.minimumTarget !== '' ? Number(form.minimumTarget) : null,
+      };
       if (isEdit && !payload.password) delete payload.password;
       if (isEdit && !canEditRole) delete payload.role; // locked in the UI, don't send a role the server would reject anyway
       if (!payload.makeMainAdmin) delete payload.isMainAdmin;
@@ -120,16 +126,30 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
         </div>
 
         {form.role === 'employee' && (
-          <div style={fieldWrap}>
-            <label style={labelStyle}>Reports to (manager)</label>
-            <select style={inputStyle} value={form.manager || ''} onChange={update('manager')}>
-              <option value="">No manager assigned</option>
-              {managers.map((m) => (
-                <option key={m._id} value={m._id}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
+          <div className="form-grid-2">
+            <div style={fieldWrap}>
+              <label style={labelStyle}>Reports to (manager)</label>
+              <select style={inputStyle} value={form.manager || ''} onChange={update('manager')}>
+                <option value="">No manager assigned</option>
+                {managers.map((m) => (
+                  <option key={m._id} value={m._id}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div style={fieldWrap}>
+              <label style={labelStyle}>Minimum target</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                style={inputStyle}
+                value={form.minimumTarget}
+                onChange={update('minimumTarget')}
+                placeholder="e.g. 10000"
+              />
+            </div>
           </div>
         )}
 

@@ -43,7 +43,7 @@ router.get('/', async (req, res) => {
 //          Creating an admin account is restricted to the main admin.
 router.post('/', authorize('admin'), async (req, res) => {
   try {
-    const { name, email, password, role, department, manager } = req.body;
+    const { name, email, password, role, department, manager, minimumTarget } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email and password are required' });
     }
@@ -66,6 +66,10 @@ router.post('/', authorize('admin'), async (req, res) => {
       role: resolvedRole,
       department: department || '',
       manager: resolvedRole === 'employee' ? manager || null : null,
+      minimumTarget:
+        resolvedRole === 'employee' && minimumTarget !== '' && minimumTarget !== undefined
+          ? minimumTarget
+          : null,
     });
 
     res.status(201).json(user.toSafeObject());
@@ -80,7 +84,7 @@ router.post('/', authorize('admin'), async (req, res) => {
 //          someone to admin, or transfer the main admin flag.
 router.put('/:id', authorize('admin'), async (req, res) => {
   try {
-    const { name, email, role, department, manager, isActive, password, isMainAdmin } = req.body;
+    const { name, email, role, department, manager, isActive, password, isMainAdmin, minimumTarget } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
@@ -116,12 +120,16 @@ router.put('/:id', authorize('admin'), async (req, res) => {
     if (email !== undefined) user.email = email.toLowerCase();
     if (role !== undefined && ['admin', 'manager', 'employee'].includes(role)) user.role = role;
     if (department !== undefined) user.department = department;
+    if (minimumTarget !== undefined) user.minimumTarget = minimumTarget === '' ? null : minimumTarget;
     if (isActive !== undefined) user.isActive = isActive;
     if (password) user.password = password; // pre-save hook will hash it
 
     // Only employees report to a manager; clear it out for anyone else.
     if (manager !== undefined) user.manager = user.role === 'employee' ? manager || null : null;
-    if (user.role !== 'employee') user.manager = null;
+    if (user.role !== 'employee') {
+      user.manager = null;
+      user.minimumTarget = null;
+    }
 
     await user.save();
     res.json(user.toSafeObject());

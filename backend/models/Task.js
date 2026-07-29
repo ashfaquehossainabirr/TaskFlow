@@ -19,6 +19,11 @@ const taskSchema = new mongoose.Schema(
       ref: 'Project',
       required: [true, 'Task must belong to a project'],
     },
+    projectValue: {
+      type: Number,
+      min: 0,
+      default: null,
+    },
     milestone: {
       type: mongoose.Schema.Types.ObjectId,
       default: null,

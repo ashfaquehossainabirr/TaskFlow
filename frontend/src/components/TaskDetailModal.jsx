@@ -180,6 +180,14 @@ export default function TaskDetailModal({ taskId, onClose }) {
                 {task.project?.name || '—'}
               </span>
             </div>
+            {(task.projectValue !== null && task.projectValue !== undefined) && (
+              <div style={row}>
+                <span style={rowLabel}>Project value</span>
+                <span style={rowValue} className="mono">
+                  {Number(task.projectValue).toLocaleString()}
+                </span>
+              </div>
+            )}
             {task.milestone && (
               <div style={row}>
                 <span style={rowLabel}>Milestone</span>

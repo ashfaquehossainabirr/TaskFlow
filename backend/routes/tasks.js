@@ -141,12 +141,18 @@ router.get('/stats/by-employee', authorize('admin', 'manager'), async (req, res)
     const employeeFilter = { role: 'employee' };
     if (req.user.role === 'manager') employeeFilter.manager = req.user._id;
 
-    const employees = await User.find(employeeFilter).select('name email department').sort({ name: 1 });
+    const employees = await User.find(employeeFilter).select('name email department minimumTarget').sort({ name: 1 });
     const employeeIds = employees.map((e) => e._id);
 
     const statusAgg = await Task.aggregate([
       { $match: { assignedTo: { $in: employeeIds } } },
-      { $group: { _id: { employee: '$assignedTo', status: '$status' }, count: { $sum: 1 } } },
+      {
+        $group: {
+          _id: { employee: '$assignedTo', status: '$status' },
+          count: { $sum: 1 },
+          projectValue: { $sum: { $ifNull: ['$projectValue', 0] } },
+        },
+      },
     ]);
 
     const projectAgg = await Task.aggregate([
@@ -164,7 +170,7 @@ router.get('/stats/by-employee', authorize('admin', 'manager'), async (req, res)
     statusAgg.forEach((row) => {
       const empId = String(row._id.employee);
       if (!statusMap[empId]) statusMap[empId] = {};
-      statusMap[empId][row._id.status] = row.count;
+      statusMap[empId][row._id.status] = { count: row.count, projectValue: row.projectValue };
     });
 
     const projectMap = {};
@@ -181,13 +187,16 @@ router.get('/stats/by-employee', authorize('admin', 'manager'), async (req, res)
         name: emp.name,
         email: emp.email,
         department: emp.department,
+        minimumTarget: emp.minimumTarget,
         projects: proj.projectCount,
         total: proj.total,
-        todo: statuses.todo || 0,
-        'in-progress': statuses['in-progress'] || 0,
-        hold: statuses.hold || 0,
-        delivered: statuses.delivered || 0,
-        cancelled: statuses.cancelled || 0,
+        todo: statuses.todo?.count || 0,
+        'in-progress': statuses['in-progress']?.count || 0,
+        hold: statuses.hold?.count || 0,
+        delivered: statuses.delivered?.count || 0,
+        cancelled: statuses.cancelled?.count || 0,
+        inProgressValue: statuses['in-progress']?.projectValue || 0,
+        deliveredValue: statuses.delivered?.projectValue || 0,
       };
     });
 
@@ -312,7 +321,7 @@ router.delete('/:id/comments/:commentId', async (req, res) => {
 //          can only assign to someone on their own team.
 router.post('/', authorize('admin', 'manager'), async (req, res) => {
   try {
-    const { title, description, project, milestone, priority, deadline, assignedTo, status } = req.body;
+    const { title, description, project, projectValue, milestone, priority, deadline, assignedTo, status } = req.body;
 
     if (!title || !project || !deadline || !assignedTo) {
       return res.status(400).json({
@@ -328,6 +337,7 @@ router.post('/', authorize('admin', 'manager'), async (req, res) => {
       title,
       description,
       project,
+      projectValue: projectValue === '' || projectValue === undefined ? null : projectValue,
       milestone: milestone || null,
       priority,
       deadline,
@@ -355,7 +365,7 @@ router.post('/', authorize('admin', 'manager'), async (req, res) => {
 //          only reassign within their own team.
 router.put('/:id', authorize('admin', 'manager'), async (req, res) => {
   try {
-    const { title, description, project, milestone, priority, deadline, assignedTo, status } = req.body;
+    const { title, description, project, projectValue, milestone, priority, deadline, assignedTo, status } = req.body;
     const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ message: 'Task not found' });
 
@@ -380,6 +390,13 @@ router.put('/:id', authorize('admin', 'manager'), async (req, res) => {
     if (project !== undefined && String(project) !== String(task.project)) {
       task.project = project;
       changedFields.push('project');
+    }
+    if (projectValue !== undefined) {
+      const normalizedValue = projectValue === '' ? null : projectValue;
+      if (Number(normalizedValue ?? NaN) !== Number(task.projectValue ?? NaN)) {
+        task.projectValue = normalizedValue;
+        changedFields.push('project value');
+      }
     }
     if (milestone !== undefined && String(milestone || '') !== String(task.milestone || '')) {
       task.milestone = milestone || null;

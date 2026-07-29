@@ -17,6 +17,7 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
     title: task?.title || '',
     description: task?.description || '',
     project: task?.project?._id || task?.project || '',
+    projectValue: task?.projectValue ?? '',
     milestone: task?.milestone || '',
     priority: task?.priority || 'medium',
     deadline: toDateInputValue(task?.deadline) || '',
@@ -49,7 +50,11 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
     }
     setSaving(true);
     try {
-      const payload = { ...form, milestone: form.milestone || null };
+      const payload = {
+        ...form,
+        milestone: form.milestone || null,
+        projectValue: form.projectValue === '' ? null : Number(form.projectValue),
+      };
       await onSubmit(payload, task?._id);
       onSaved();
     } catch (err) {
@@ -124,6 +129,21 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
                 </option>
               ))}
             </select>
+          </div>
+        </div>
+
+        <div className="form-grid-2">
+          <div style={fieldWrap}>
+            <label style={labelStyle}>Project value</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              style={inputStyle}
+              value={form.projectValue}
+              onChange={update('projectValue')}
+              placeholder="e.g. 5000"
+            />
           </div>
         </div>
 

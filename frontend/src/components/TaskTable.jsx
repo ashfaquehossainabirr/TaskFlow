@@ -56,11 +56,12 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
         .task-row:hover td .projectName { color: var(--accent-cyan) !important; transition: color 0.2s ease; }
       `}</style>
       <div style={{ overflowX: 'auto', maxHeight: "500px", overflowY: 'auto', paddingRight: "6px", paddingBottom: "6px" }}>
-        <table style={{ width: '100%', minWidth: 1275, borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', minWidth: 1425, borderCollapse: 'collapse' }}>
           <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: 'var(--bg-panel)', paddingTop: "6px" }}>
             <tr>
               <th style={thStyle}>Task</th>
               <th style={thStyle}>Project</th>
+              <th style={thStyle}>Project Value</th>
               {isAdmin && <th style={thStyle}>Assigned To</th>}
               <th style={thStyle}>Priority</th>
               <th style={thStyle}>Deadline</th>
@@ -108,6 +109,15 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
                   >
                     {task.project?.name || '—'}
                   </span>
+                </td>
+                <td style={tdStyle}>
+                  {(task.projectValue !== null && task.projectValue !== undefined) ? (
+                    <span className="mono" style={{ fontSize: 13, color: 'var(--text-primary)' }}>
+                      ${Number(task.projectValue).toLocaleString()}
+                    </span>
+                  ) : (
+                    <span style={{ color: 'var(--text-muted)' }}>—</span>
+                  )}
                 </td>
                 {isAdmin && (
                   <td style={tdStyle}>

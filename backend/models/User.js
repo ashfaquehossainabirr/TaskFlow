@@ -49,6 +49,14 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    // Minimum project-value target for this employee, shown against their
+    // actual in-progress/delivered totals on the Employee Stats page.
+    // Only meaningful for employees; managers/admins leave this null.
+    minimumTarget: {
+      type: Number,
+      min: 0,
+      default: null,
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -77,6 +85,7 @@ userSchema.methods.toSafeObject = function toSafeObject() {
     isMainAdmin: this.isMainAdmin,
     manager: this.manager,
     department: this.department,
+    minimumTarget: this.minimumTarget,
     isActive: this.isActive,
     createdAt: this.createdAt,
   };
