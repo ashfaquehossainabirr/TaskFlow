@@ -69,6 +69,7 @@ export default function DeadlineWatch() {
       <TaskTable
         tasks={tasks}
         isAdmin={isAdmin}
+        showActions={false}
         onStatusChange={handleStatusChange}
         onRowClick={(task) => setDetailTaskId(task._id)}
         emptyLabel="Nothing due within 3 days. You're clear."

@@ -23,7 +23,7 @@ const tdStyle = {
   verticalAlign: 'middle',
 };
 
-export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDelete, deletingId, onRowClick, emptyLabel }) {
+export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDelete, deletingId, onRowClick, emptyLabel, showActions = true }) {
   if (!tasks || tasks.length === 0) {
     return (
       <div
@@ -66,7 +66,7 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
               <th style={thStyle}>Priority</th>
               <th style={thStyle}>Deadline</th>
               <th style={thStyle}>Status</th>
-              {isAdmin && <th style={thStyle}></th>}
+              {isAdmin && showActions && <th style={thStyle}></th>}
             </tr>
           </thead>
           <tbody>
@@ -156,7 +156,7 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
                     <StatusBadge status={task.status} />
                   )}
                 </td>
-                {isAdmin && (
+                {isAdmin && showActions && (
                   <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button onClick={() => onEdit(task)} style={iconBtnStyle}>
