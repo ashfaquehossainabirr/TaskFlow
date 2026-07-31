@@ -1,5 +1,4 @@
 :root {
-  /* Color tokens - "ops console" direction (dark theme, default) */
   --bg-void: #0b1017;
   --bg-panel: #121a24;
   --bg-panel-raised: #182430;
@@ -23,20 +22,12 @@
 
   --urgent-glow: #ff5d5d;
 
-  /* Text colors for small tinted status banners/chips - kept as their own
-     tokens (rather than reusing --status-*) because these need to stay
-     readable against a light rgba(...) fill in BOTH themes, which means
-     the light theme needs noticeably darker/more saturated values than
-     the pastel tones that read fine on a dark background. */
   --text-error: #ff8a85;
   --text-warning: #ffb454;
   --text-info: #7ec8ff;
 
   --overlay-scrim: rgba(6, 9, 13, 0.65);
 
-  /* Deadline chip fills - dark theme values read fine as a subtle tint since
-     the surrounding panel is already dark. Light theme overrides these below
-     with higher opacity so the chip doesn't wash out against a white panel. */
   --chip-overdue-bg: rgba(239, 100, 97, 0.14);
   --chip-overdue-border: rgba(239, 100, 97, 0.4);
   --chip-urgent-bg: rgba(240, 168, 63, 0.14);
@@ -53,7 +44,6 @@
   --font-mono: 'JetBrains Mono', monospace;
 }
 
-/* Light theme - toggled via data-theme="light" on <html>, set by ThemeContext */
 [data-theme='light'] {
   --bg-void: #f4f6f8;
   --bg-panel: #ffffff;
@@ -106,9 +96,6 @@ body {
   margin: 0;
   overflow-x: hidden;
   background: var(--bg-void);
-  /* background-image:
-    radial-gradient(circle at 10% 0%, rgba(79, 216, 224, 0.06), transparent 40%),
-    radial-gradient(circle at 90% 100%, rgba(74, 158, 255, 0.05), transparent 45%); */
   color: var(--text-primary);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
@@ -124,9 +111,6 @@ button {
   font-family: inherit;
 }
 
-/* Universal button hover/press feedback. Works regardless of a button's own
-   inline background color since brightness()/transform don't depend on it -
-   this is what covers every button across the app without editing each one. */
 button:not(:disabled) {
   transition: filter 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
   cursor: pointer;
