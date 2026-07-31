@@ -123,6 +123,13 @@ button:not(:disabled):active {
   filter: brightness(0.92);
   transform: translateY(0);
 }
+
+[data-theme='light'] button:not(:disabled):hover {
+  filter: brightness(0.94);
+}
+[data-theme='light'] button:not(:disabled):active {
+  filter: brightness(0.88);
+}
 button:disabled {
   cursor: default;
   opacity: 0.65;
