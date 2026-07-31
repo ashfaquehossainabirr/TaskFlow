@@ -34,6 +34,16 @@
 
   --overlay-scrim: rgba(6, 9, 13, 0.65);
 
+  /* Deadline chip fills - dark theme values read fine as a subtle tint since
+     the surrounding panel is already dark. Light theme overrides these below
+     with higher opacity so the chip doesn't wash out against a white panel. */
+  --chip-overdue-bg: rgba(239, 100, 97, 0.14);
+  --chip-overdue-border: rgba(239, 100, 97, 0.4);
+  --chip-urgent-bg: rgba(240, 168, 63, 0.14);
+  --chip-urgent-border: rgba(240, 168, 63, 0.4);
+  --chip-soon-bg: rgba(74, 158, 255, 0.1);
+  --chip-soon-border: rgba(74, 158, 255, 0.3);
+
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 14px;
@@ -73,6 +83,13 @@
   --text-info: #1d4ed8;
 
   --overlay-scrim: rgba(23, 31, 39, 0.5);
+
+  --chip-overdue-bg: rgba(214, 71, 63, 0.2);
+  --chip-overdue-border: rgba(214, 71, 63, 0.55);
+  --chip-urgent-bg: rgba(201, 121, 28, 0.2);
+  --chip-urgent-border: rgba(201, 121, 28, 0.55);
+  --chip-soon-bg: rgba(47, 111, 214, 0.16);
+  --chip-soon-border: rgba(47, 111, 214, 0.45);
 }
 
 * {

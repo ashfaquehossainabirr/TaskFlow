@@ -210,11 +210,15 @@ const iconBtnStyle = {
 };
 
 function PriorityTag({ priority }) {
+  // Use the dedicated --text-* tokens (not the raw --status-* ones) since
+  // those are tuned to stay readable as plain text on the panel background
+  // in both themes - the --status-* tokens are tuned for badge fills instead,
+  // which is why priority text looked washed out in light mode.
   const colors = {
     low: 'var(--text-muted)',
-    medium: 'var(--status-progress)',
-    high: 'var(--status-hold)',
-    urgent: 'var(--status-cancelled)',
+    medium: 'var(--text-info)',
+    high: 'var(--text-warning)',
+    urgent: 'var(--text-error)',
   };
   return (
     <span
