@@ -1,6 +1,7 @@
 import StatusBadge from './StatusBadge';
 import DeadlineChip from './DeadlineChip';
 import { STATUS_LABELS } from '../utils/deadline';
+import { formatMoney, exactMoney } from '../utils/currency';
 
 const STATUS_OPTIONS = Object.keys(STATUS_LABELS);
 
@@ -61,7 +62,7 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
             <tr>
               <th style={thStyle}>Task</th>
               <th style={thStyle}>Project</th>
-              <th style={thStyle}>Project Value</th>
+              <th style={{ ...thStyle, maxWidth: 140 }}>Project Value</th>
               {isAdmin && <th style={thStyle}>Assigned To</th>}
               <th style={thStyle}>Priority</th>
               <th style={thStyle}>Deadline</th>
@@ -110,10 +111,22 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
                     {task.project?.name || '—'}
                   </span>
                 </td>
-                <td style={tdStyle}>
+                <td style={{ ...tdStyle, maxWidth: 140 }}>
                   {(task.projectValue !== null && task.projectValue !== undefined) ? (
-                    <span className="mono" style={{ fontSize: 13, color: 'var(--text-primary)' }}>
-                      ${Number(task.projectValue).toLocaleString()}
+                    <span
+                      className="mono"
+                      title={exactMoney(task.projectValue)}
+                      style={{
+                        fontSize: 13,
+                        color: 'var(--text-primary)',
+                        display: 'inline-block',
+                        maxWidth: '100%',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      ${formatMoney(task.projectValue)}
                     </span>
                   ) : (
                     <span style={{ color: 'var(--text-muted)' }}>—</span>

@@ -1,3 +1,5 @@
+import { formatMoney, exactMoney } from '../utils/currency';
+
 const MINI_STATS = [
   { key: 'todo', label: 'To Do', color: 'var(--status-todo)' },
   { key: 'in-progress', label: 'In Progress', color: 'var(--status-progress)' },
@@ -25,22 +27,6 @@ function initials(name = '') {
   if (parts.length === 0) return '?';
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
-function formatMoney(value) {
-  const num = Number(value) || 0;
-  const abs = Math.abs(num);
-  if (abs >= 1_000_000) {
-    return new Intl.NumberFormat('en-US', {
-      notation: 'compact',
-      maximumFractionDigits: 2,
-    }).format(num);
-  }
-  return num.toLocaleString();
-}
-
-function exactMoney(value) {
-  return `$${(Number(value) || 0).toLocaleString()}`;
 }
 
 export default function EmployeeStatCard({ employee, onClick }) {
