@@ -9,6 +9,7 @@ import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 import KanbanBoard from './pages/KanbanBoard';
 import CalendarView from './pages/CalendarView';
+import Notes from './pages/Notes';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -68,6 +69,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <DeadlineWatch />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notes"
+        element={
+          <ProtectedRoute>
+            <Notes />
           </ProtectedRoute>
         }
       />

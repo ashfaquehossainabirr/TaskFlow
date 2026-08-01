@@ -267,7 +267,7 @@ export default function TaskDetailModal({ taskId, onClose }) {
                   title={isOtherTaskActive ? 'Stop your other running timer first' : undefined}
                   style={{
                     background: isOtherTaskActive ? 'var(--bg-inset)' : 'var(--accent-cyan)',
-                    color: isOtherTaskActive ? 'var(--text-muted)' : '#0b1017',
+                    color: isOtherTaskActive ? 'var(--text-muted)' : 'var(--text-on-accent)',
                     border: isOtherTaskActive ? '1px solid var(--border-hairline)' : 'none',
                     borderRadius: 8,
                     padding: '8px 16px',
@@ -451,7 +451,7 @@ export default function TaskDetailModal({ taskId, onClose }) {
                   disabled={posting || !commentText.trim()}
                   style={{
                     background: 'var(--accent-cyan)',
-                    color: '#0b1017',
+                    color: 'var(--text-on-accent)',
                     border: 'none',
                     borderRadius: 8,
                     padding: '8px 16px',

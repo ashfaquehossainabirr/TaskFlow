@@ -55,7 +55,7 @@ export default function Login() {
               justifyContent: 'center',
               fontFamily: 'var(--font-mono)',
               fontWeight: 700,
-              color: '#0b1017',
+              color: 'var(--text-on-accent)',
             }}
           >
             T
@@ -141,7 +141,7 @@ export default function Login() {
               justifyContent: 'center',
               fontFamily: 'var(--font-mono)',
               fontWeight: 700,
-              color: '#0b1017',
+              color: 'var(--text-on-accent)',
             }}
           >
             T
@@ -209,7 +209,7 @@ export default function Login() {
               borderRadius: 8,
               border: 'none',
               background: 'var(--accent-cyan)',
-              color: '#0b1017',
+              color: 'var(--text-on-accent)',
               fontWeight: 700,
               fontSize: 14.5,
               cursor: 'pointer',

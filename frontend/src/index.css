@@ -55,7 +55,9 @@
   --text-primary: #171f27;
   --text-secondary: #4d5c6a;
   --text-muted: #85929e;
-  --text-on-accent: #0b1017;
+  /* Light theme's accent-cyan is a darker, more saturated teal than dark
+     theme's — near-black text on it loses contrast, so use white instead. */
+  --text-on-accent: #ffffff;
 
   --accent-cyan: #0891a3;
   --accent-cyan-dim: #bfeef2;

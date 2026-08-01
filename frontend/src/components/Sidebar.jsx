@@ -39,7 +39,7 @@ export default function Sidebar({ isOpen, onClose }) {
       {isOpen && <div className="sidebar-overlay" onClick={onClose} />}
 
       <aside className={`sidebar${isOpen ? ' sidebar-open' : ''}`}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 8px 26px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 8px 26px', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
             <div
               style={{
@@ -53,7 +53,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 fontFamily: 'var(--font-mono)',
                 fontWeight: 700,
                 fontSize: 13,
-                color: '#0b1017',
+                color: 'var(--text-on-accent)',
               }}
             >
               T
@@ -67,7 +67,7 @@ export default function Sidebar({ isOpen, onClose }) {
           </button>
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <nav className="sidebar-nav" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <NavLink to="/" end style={linkStyle}>
             Overview
           </NavLink>
@@ -86,6 +86,9 @@ export default function Sidebar({ isOpen, onClose }) {
           <NavLink to="/deadlines" style={linkStyle}>
             Deadline Watch
           </NavLink>
+          <NavLink to="/notes" style={linkStyle}>
+            My Notes
+          </NavLink>
           {isAdmin && (
             <NavLink to="/users" style={linkStyle}>
               Team &amp; Access
@@ -98,7 +101,7 @@ export default function Sidebar({ isOpen, onClose }) {
           )}
         </nav>
 
-        <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid var(--border-hairline-soft)' }}>
+        <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid var(--border-hairline-soft)', flexShrink: 0 }}>
           <ActiveTimerBar />
           <div style={{ marginBottom: 10 }}>
             <ThemeToggle />
@@ -194,6 +197,30 @@ export default function Sidebar({ isOpen, onClose }) {
           height: 100vh;
           position: sticky;
           top: 0;
+          overflow: hidden;
+        }
+        .sidebar-nav {
+          flex: 1 1 auto;
+          min-height: 0;
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding-right: 2px;
+          scrollbar-width: thin;
+          scrollbar-color: var(--border-hairline) transparent;
+        }
+        .sidebar-nav::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        .sidebar-nav::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb {
+          background: var(--border-hairline);
+          border-radius: 10px;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb:hover {
+          background: var(--text-muted);
         }
         .sidebar-close-btn {
           display: none;

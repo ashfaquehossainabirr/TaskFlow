@@ -274,7 +274,7 @@ const iconBtnStyle = {
 
 const smallPrimaryBtn = {
   background: 'var(--accent-cyan)',
-  color: '#0b1017',
+  color: 'var(--text-on-accent)',
   border: 'none',
   borderRadius: 8,
   padding: '8px 14px',

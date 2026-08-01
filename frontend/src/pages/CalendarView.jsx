@@ -217,7 +217,7 @@ export default function CalendarView() {
         }
         .cal-day-today .cal-day-number {
           background: var(--accent-cyan);
-          color: #0b1017;
+          color: var(--text-on-accent);
           border-radius: 6px;
           width: 22px;
           height: 22px;

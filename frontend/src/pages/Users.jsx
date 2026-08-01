@@ -100,7 +100,7 @@ export default function Users() {
           }}
           style={{
             background: 'var(--accent-cyan)',
-            color: '#0b1017',
+            color: 'var(--text-on-accent)',
             border: 'none',
             borderRadius: 8,
             padding: '10px 18px',
@@ -198,7 +198,7 @@ export default function Users() {
                         padding: '2px 6px',
                         borderRadius: 4,
                         background: 'var(--accent-cyan)',
-                        color: '#0b1017',
+                        color: 'var(--text-on-accent)',
                       }}
                     >
                       MAIN
