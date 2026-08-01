@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTimer } from '../context/TimerContext';
 import { daysRemaining } from '../utils/deadline';
 import { formatStopwatch, formatDurationShort } from '../utils/time';
+import { formatMoney, exactMoney } from '../utils/currency';
 const row = {
   display: 'flex',
   justifyContent: 'space-between',
@@ -236,8 +237,8 @@ export default function TaskDetailModal({ taskId, onClose }) {
             {task.projectValue !== null && task.projectValue !== undefined && (
               <div style={row}>
                 <span style={rowLabel}>Project value</span>
-                <span style={rowValue} className="mono">
-                  {Number(task.projectValue).toLocaleString()}
+                <span style={rowValue} className="mono" title={exactMoney(task.projectValue)}>
+                  ${formatMoney(task.projectValue)}
                 </span>
               </div>
             )}

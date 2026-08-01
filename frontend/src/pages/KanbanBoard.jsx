@@ -292,10 +292,17 @@ export default function KanbanBoard() {
           border-radius: 10px;
           padding: 12px;
           cursor: grab;
-          transition: border-color 0.15s ease, transform 0.15s ease;
+          transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
         }
         .kanban-card:hover {
           border-color: var(--accent-cyan-dim);
+        }
+        [data-theme='light'] .kanban-card {
+          background: var(--bg-panel);
+          border-color: var(--border-hairline);
+        }
+        [data-theme='light'] .kanban-card:hover {
+          border-color: var(--accent-cyan);
         }
         .kanban-card:active {
           cursor: grabbing;
