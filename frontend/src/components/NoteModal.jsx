@@ -2,18 +2,39 @@ import { useState } from 'react';
 import Modal from './Modal';
 import api from '../api/axios';
 import { fieldWrap, labelStyle, inputStyle, primaryBtn, secondaryBtn, errorBanner } from './formStyles';
-
 export const NOTE_COLORS = [
-  { value: 'default', label: 'Slate', swatch: 'var(--text-muted)' },
-  { value: 'cyan', label: 'Cyan', swatch: 'var(--accent-cyan)' },
-  { value: 'amber', label: 'Amber', swatch: 'var(--status-hold)' },
-  { value: 'green', label: 'Green', swatch: 'var(--status-delivered)' },
-  { value: 'red', label: 'Red', swatch: 'var(--status-cancelled)' },
-  { value: 'violet', label: 'Violet', swatch: '#a78bfa' },
+  {
+    value: 'default',
+    label: 'Slate',
+    swatch: 'var(--text-muted)',
+  },
+  {
+    value: 'cyan',
+    label: 'Cyan',
+    swatch: 'var(--accent-cyan)',
+  },
+  {
+    value: 'amber',
+    label: 'Amber',
+    swatch: 'var(--status-hold)',
+  },
+  {
+    value: 'green',
+    label: 'Green',
+    swatch: 'var(--status-delivered)',
+  },
+  {
+    value: 'red',
+    label: 'Red',
+    swatch: 'var(--status-cancelled)',
+  },
+  {
+    value: 'violet',
+    label: 'Violet',
+    swatch: '#a78bfa',
+  },
 ];
-
 const colorSwatch = (color) => NOTE_COLORS.find((c) => c.value === color)?.swatch || NOTE_COLORS[0].swatch;
-
 const formatDate = (iso) =>
   new Date(iso).toLocaleString(undefined, {
     month: 'short',
@@ -22,11 +43,6 @@ const formatDate = (iso) =>
     hour: 'numeric',
     minute: '2-digit',
   });
-
-// One modal that covers the whole personal-notes CRUD flow:
-//  - note === null            -> "create" mode (blank form)
-//  - note !== null, !editing  -> "view" mode (details view)
-//  - note !== null, editing   -> "edit" mode (form pre-filled)
 export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
   const isNew = !note;
   const [editing, setEditing] = useState(isNew);
@@ -40,10 +56,11 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-
   const update = (key) => (e) =>
-    setForm((f) => ({ ...f, [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }));
-
+    setForm((f) => ({
+      ...f,
+      [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
+    }));
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -68,7 +85,6 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
       setSaving(false);
     }
   };
-
   const handleDelete = async () => {
     setDeleting(true);
     setError('');
@@ -80,9 +96,7 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
       setDeleting(false);
     }
   };
-
   const title = isNew ? 'New note' : editing ? 'Edit note' : note.title;
-
   return (
     <Modal title={title} onClose={onClose} width={520}>
       {error && <div style={errorBanner}>{error}</div>}
@@ -103,7 +117,11 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
           <div style={fieldWrap}>
             <label style={labelStyle}>Note</label>
             <textarea
-              style={{ ...inputStyle, minHeight: 160, resize: 'vertical' }}
+              style={{
+                ...inputStyle,
+                minHeight: 160,
+                resize: 'vertical',
+              }}
               value={form.content}
               onChange={update('content')}
               placeholder="Write your note…"
@@ -112,12 +130,23 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
 
           <div style={fieldWrap}>
             <label style={labelStyle}>Color</label>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: 8,
+                flexWrap: 'wrap',
+              }}
+            >
               {NOTE_COLORS.map((c) => (
                 <button
                   type="button"
                   key={c.value}
-                  onClick={() => setForm((f) => ({ ...f, color: c.value }))}
+                  onClick={() =>
+                    setForm((f) => ({
+                      ...f,
+                      color: c.value,
+                    }))
+                  }
                   title={c.label}
                   aria-label={c.label}
                   style={{
@@ -125,7 +154,8 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
                     height: 28,
                     borderRadius: '50%',
                     background: c.swatch,
-                    border: form.color === c.value ? '2px solid var(--text-primary)' : '2px solid transparent',
+                    border:
+                      form.color === c.value ? '2px solid var(--text-primary)' : '2px solid transparent',
                     boxShadow: form.color === c.value ? '0 0 0 2px var(--bg-panel-raised)' : 'none',
                     cursor: 'pointer',
                     padding: 0,
@@ -135,20 +165,45 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
             </div>
           </div>
 
-          <div style={{ ...fieldWrap, marginBottom: 4 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, color: 'var(--text-secondary)' }}>
+          <div
+            style={{
+              ...fieldWrap,
+              marginBottom: 4,
+            }}
+          >
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 13.5,
+                color: 'var(--text-secondary)',
+              }}
+            >
               <input type="checkbox" checked={form.pinned} onChange={update('pinned')} />
               Pin to top
             </label>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 10,
+              marginTop: 20,
+            }}
+          >
             {!isNew && (
               <button
                 type="button"
                 style={secondaryBtn}
                 onClick={() => {
-                  setForm({ title: note.title, content: note.content, color: note.color, pinned: note.pinned });
+                  setForm({
+                    title: note.title,
+                    content: note.content,
+                    color: note.color,
+                    pinned: note.pinned,
+                  });
                   setError('');
                   setEditing(false);
                 }}
@@ -168,7 +223,14 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
         </form>
       ) : (
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              marginBottom: 14,
+            }}
+          >
             <span
               style={{
                 width: 12,
@@ -178,7 +240,12 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
                 flexShrink: 0,
               }}
             />
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+            <span
+              style={{
+                fontSize: 12,
+                color: 'var(--text-muted)',
+              }}
+            >
               {note.pinned ? 'Pinned · ' : ''}Updated {formatDate(note.updatedAt)}
             </span>
           </div>
@@ -193,10 +260,26 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
               minHeight: 40,
             }}
           >
-            {note.content ? note.content : <span style={{ color: 'var(--text-muted)' }}>No additional details.</span>}
+            {note.content ? (
+              note.content
+            ) : (
+              <span
+                style={{
+                  color: 'var(--text-muted)',
+                }}
+              >
+                No additional details.
+              </span>
+            )}
           </p>
 
-          <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginBottom: 20 }}>
+          <div
+            style={{
+              fontSize: 11.5,
+              color: 'var(--text-muted)',
+              marginBottom: 20,
+            }}
+          >
             Created {formatDate(note.createdAt)}
           </div>
 
@@ -212,9 +295,27 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
                 gap: 10,
               }}
             >
-              <span style={{ fontSize: 13, color: 'var(--text-primary)' }}>Delete this note? This cannot be undone.</span>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                <button type="button" style={secondaryBtn} onClick={() => setConfirmDelete(false)} disabled={deleting}>
+              <span
+                style={{
+                  fontSize: 13,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                Delete this note? This cannot be undone.
+              </span>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: 10,
+                }}
+              >
+                <button
+                  type="button"
+                  style={secondaryBtn}
+                  onClick={() => setConfirmDelete(false)}
+                  disabled={deleting}
+                >
                   Keep note
                 </button>
                 <button
@@ -237,7 +338,13 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: 10,
+              }}
+            >
               <button type="button" style={secondaryBtn} onClick={() => setConfirmDelete(true)}>
                 Delete
               </button>

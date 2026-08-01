@@ -7,7 +7,6 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { STATUS_LABELS, STATUS_ORDER } from '../utils/deadline';
 import { canManageTasks } from '../utils/roles';
-
 const COLUMN_COLORS = {
   todo: 'var(--status-todo)',
   'in-progress': 'var(--status-progress)',
@@ -15,77 +14,79 @@ const COLUMN_COLORS = {
   delivered: 'var(--status-delivered)',
   cancelled: 'var(--status-cancelled)',
 };
-
 export default function KanbanBoard() {
   const { user } = useAuth();
   const isAdmin = canManageTasks(user.role);
-
   const [tasks, setTasks] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [projectFilter, setProjectFilter] = useState('');
-
   const [dragTaskId, setDragTaskId] = useState(null);
   const [dragOverStatus, setDragOverStatus] = useState(null);
-
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [detailTaskId, setDetailTaskId] = useState(null);
-
   const loadTasks = async () => {
     setLoading(true);
     try {
       const params = {};
       if (projectFilter) params.project = projectFilter;
-      const res = await api.get('/tasks', { params });
+      const res = await api.get('/tasks', {
+        params,
+      });
       setTasks(res.data);
     } finally {
       setLoading(false);
     }
   };
-
   const loadEmployees = async () => {
     if (!isAdmin) return;
-    const res = await api.get('/users', { params: { role: 'employee' } });
+    const res = await api.get('/users', {
+      params: {
+        role: 'employee',
+      },
+    });
     setEmployees(res.data);
   };
-
   const loadProjects = async () => {
     const res = await api.get('/projects');
     setProjects(res.data);
   };
-
   useEffect(() => {
     loadEmployees();
     loadProjects();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   useEffect(() => {
     loadTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectFilter]);
-
   const handleDropOnColumn = async (status) => {
     setDragOverStatus(null);
     const taskId = dragTaskId;
     setDragTaskId(null);
     if (!taskId) return;
-
     const task = tasks.find((t) => t._id === taskId);
     if (!task || task.status === status) return;
-
     const prev = tasks;
-    setTasks((ts) => ts.map((t) => (t._id === task._id ? { ...t, status } : t)));
+    setTasks((ts) =>
+      ts.map((t) =>
+        t._id === task._id
+          ? {
+              ...t,
+              status,
+            }
+          : t
+      )
+    );
     try {
-      await api.patch(`/tasks/${task._id}/status`, { status });
+      await api.patch(`/tasks/${task._id}/status`, {
+        status,
+      });
     } catch (err) {
       setTasks(prev);
       alert(err.response?.data?.message || 'Failed to move task');
     }
   };
-
   const handleSubmit = async (form, taskId) => {
     if (taskId) {
       await api.put(`/tasks/${taskId}`, form);
@@ -93,7 +94,6 @@ export default function KanbanBoard() {
       await api.post('/tasks', form);
     }
   };
-
   const handleDelete = async (task) => {
     if (!window.confirm(`Delete "${task.title}"? This cannot be undone.`)) return;
     try {
@@ -103,14 +103,12 @@ export default function KanbanBoard() {
       alert(err.response?.data?.message || 'Failed to delete task');
     }
   };
-
   const columns = STATUS_ORDER.map((status) => ({
     status,
     label: STATUS_LABELS[status],
     color: COLUMN_COLORS[status],
     tasks: tasks.filter((t) => t.status === status),
   }));
-
   return (
     <PageShell
       title="Kanban Board"
@@ -129,7 +127,11 @@ export default function KanbanBoard() {
         )
       }
     >
-      <div style={{ marginBottom: 18 }}>
+      <div
+        style={{
+          marginBottom: 18,
+        }}
+      >
         <select value={projectFilter} onChange={(e) => setProjectFilter(e.target.value)} style={selectStyle}>
           <option value="">All projects</option>
           {projects.map((p) => (
@@ -141,14 +143,23 @@ export default function KanbanBoard() {
       </div>
 
       {loading ? (
-        <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>Loading board…</div>
+        <div
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 14,
+          }}
+        >
+          Loading board…
+        </div>
       ) : (
         <div className="kanban-scroll">
           {columns.map((col) => (
             <div
               key={col.status}
               className={`kanban-column${dragOverStatus === col.status ? ' kanban-column-hover' : ''}`}
-              style={{ '--col-color': col.color }}
+              style={{
+                '--col-color': col.color,
+              }}
               onDragOver={(e) => {
                 e.preventDefault();
                 if (dragOverStatus !== col.status) setDragOverStatus(col.status);
@@ -178,7 +189,15 @@ export default function KanbanBoard() {
                   >
                     <div className="kanban-card-title">{task.title}</div>
                     <div className="kanban-card-project mono">{task.project?.name || '—'}</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, gap: 8 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: 8,
+                        gap: 8,
+                      }}
+                    >
                       <DeadlineChip deadline={task.deadline} status={task.status} />
                       {isAdmin && task.assignedTo?.name && (
                         <span className="kanban-card-assignee">{task.assignedTo.name}</span>
@@ -339,7 +358,6 @@ export default function KanbanBoard() {
     </PageShell>
   );
 }
-
 const primaryBtnStyle = {
   background: 'var(--accent-cyan)',
   color: 'var(--text-on-accent)',
@@ -350,7 +368,6 @@ const primaryBtnStyle = {
   fontWeight: 700,
   cursor: 'pointer',
 };
-
 const selectStyle = {
   background: 'var(--bg-inset)',
   border: '1px solid var(--border-hairline)',

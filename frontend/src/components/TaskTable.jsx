@@ -2,9 +2,7 @@ import StatusBadge from './StatusBadge';
 import DeadlineChip from './DeadlineChip';
 import { STATUS_LABELS } from '../utils/deadline';
 import { formatMoney, exactMoney } from '../utils/currency';
-
 const STATUS_OPTIONS = Object.keys(STATUS_LABELS);
-
 const thStyle = {
   textAlign: 'left',
   padding: '10px 16px',
@@ -15,7 +13,6 @@ const thStyle = {
   letterSpacing: '0.05em',
   borderBottom: '1px solid var(--border-hairline-soft)',
 };
-
 const tdStyle = {
   padding: '14px 16px',
   fontSize: 13.5,
@@ -23,8 +20,17 @@ const tdStyle = {
   borderBottom: '1px solid var(--border-hairline-soft)',
   verticalAlign: 'middle',
 };
-
-export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDelete, deletingId, onRowClick, emptyLabel, showActions = true }) {
+export default function TaskTable({
+  tasks,
+  isAdmin,
+  onStatusChange,
+  onEdit,
+  onDelete,
+  deletingId,
+  onRowClick,
+  emptyLabel,
+  showActions = true,
+}) {
   if (!tasks || tasks.length === 0) {
     return (
       <div
@@ -41,7 +47,6 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
       </div>
     );
   }
-
   return (
     <div
       style={{
@@ -56,13 +61,42 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
         .task-row:hover td .taskTitle { color: var(--accent-cyan); transition: color 0.2s ease; }
         .task-row:hover td .projectName { color: var(--accent-cyan) !important; transition: color 0.2s ease; }
       `}</style>
-      <div style={{ overflowX: 'auto', maxHeight: "500px", overflowY: 'auto', paddingRight: "6px", paddingBottom: "6px" }}>
-        <table style={{ width: '100%', minWidth: 1425, borderCollapse: 'collapse' }}>
-          <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: 'var(--bg-panel)', paddingTop: "6px" }}>
+      <div
+        style={{
+          overflowX: 'auto',
+          maxHeight: '500px',
+          overflowY: 'auto',
+          paddingRight: '6px',
+          paddingBottom: '6px',
+        }}
+      >
+        <table
+          style={{
+            width: '100%',
+            minWidth: 1425,
+            borderCollapse: 'collapse',
+          }}
+        >
+          <thead
+            style={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 1,
+              background: 'var(--bg-panel)',
+              paddingTop: '6px',
+            }}
+          >
             <tr>
               <th style={thStyle}>Task</th>
               <th style={thStyle}>Project</th>
-              <th style={{ ...thStyle, maxWidth: 140 }}>Project Value</th>
+              <th
+                style={{
+                  ...thStyle,
+                  maxWidth: 140,
+                }}
+              >
+                Project Value
+              </th>
               {isAdmin && <th style={thStyle}>Assigned To</th>}
               <th style={thStyle}>Priority</th>
               <th style={thStyle}>Deadline</th>
@@ -75,11 +109,24 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
               <tr
                 key={task._id}
                 onClick={() => onRowClick && onRowClick(task)}
-                style={onRowClick ? { cursor: 'pointer' } : undefined}
+                style={
+                  onRowClick
+                    ? {
+                        cursor: 'pointer',
+                      }
+                    : undefined
+                }
                 className={onRowClick ? 'task-row' : undefined}
               >
                 <td style={tdStyle}>
-                  <div style={{ fontWeight: 600 }} className='taskTitle'>{task.title}</div>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                    }}
+                    className="taskTitle"
+                  >
+                    {task.title}
+                  </div>
                   {task.description && (
                     <div
                       style={{
@@ -111,8 +158,13 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
                     {task.project?.name || '—'}
                   </span>
                 </td>
-                <td style={{ ...tdStyle, maxWidth: 140 }}>
-                  {(task.projectValue !== null && task.projectValue !== undefined) ? (
+                <td
+                  style={{
+                    ...tdStyle,
+                    maxWidth: 140,
+                  }}
+                >
+                  {task.projectValue !== null && task.projectValue !== undefined ? (
                     <span
                       className="mono"
                       title={exactMoney(task.projectValue)}
@@ -129,13 +181,32 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
                       ${formatMoney(task.projectValue)}
                     </span>
                   ) : (
-                    <span style={{ color: 'var(--text-muted)' }}>—</span>
+                    <span
+                      style={{
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      —
+                    </span>
                   )}
                 </td>
                 {isAdmin && (
                   <td style={tdStyle}>
-                    <div style={{ fontSize: 13 }}>{task.assignedTo?.name || '—'}</div>
-                    <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>{task.assignedTo?.department}</div>
+                    <div
+                      style={{
+                        fontSize: 13,
+                      }}
+                    >
+                      {task.assignedTo?.name || '—'}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11.5,
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      {task.assignedTo?.department}
+                    </div>
                   </td>
                 )}
                 <td style={tdStyle}>
@@ -171,7 +242,12 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
                 </td>
                 {isAdmin && showActions && (
                   <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 8,
+                      }}
+                    >
                       <button onClick={() => onEdit(task)} style={iconBtnStyle}>
                         Edit
                       </button>
@@ -198,7 +274,6 @@ export default function TaskTable({ tasks, isAdmin, onStatusChange, onEdit, onDe
     </div>
   );
 }
-
 const iconBtnStyle = {
   background: 'transparent',
   border: '1px solid var(--border-hairline)',
@@ -208,12 +283,7 @@ const iconBtnStyle = {
   fontSize: 12,
   cursor: 'pointer',
 };
-
 function PriorityTag({ priority }) {
-  // Use the dedicated --text-* tokens (not the raw --status-* ones) since
-  // those are tuned to stay readable as plain text on the panel background
-  // in both themes - the --status-* tokens are tuned for badge fills instead,
-  // which is why priority text looked washed out in light mode.
   const colors = {
     low: 'var(--text-muted)',
     medium: 'var(--text-info)',

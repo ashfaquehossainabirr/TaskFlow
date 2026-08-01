@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
-
 const STATUS_VALUES = ['planning', 'active', 'on-hold', 'completed', 'cancelled'];
 const MILESTONE_STATUS_VALUES = ['pending', 'in-progress', 'completed'];
-
 const milestoneSchema = new mongoose.Schema(
   {
     title: {
@@ -25,9 +23,10 @@ const milestoneSchema = new mongoose.Schema(
       default: 'pending',
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
-
 const projectSchema = new mongoose.Schema(
   {
     name: {
@@ -64,10 +63,10 @@ const projectSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
-
 projectSchema.statics.STATUS_VALUES = STATUS_VALUES;
 projectSchema.statics.MILESTONE_STATUS_VALUES = MILESTONE_STATUS_VALUES;
-
 module.exports = mongoose.model('Project', projectSchema);

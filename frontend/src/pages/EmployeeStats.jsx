@@ -5,7 +5,6 @@ import EmployeeTasksModal from '../components/EmployeeTasksModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
-
 export default function EmployeeStats() {
   const { user } = useAuth();
   const isAdmin = user.role === 'admin';
@@ -15,7 +14,6 @@ export default function EmployeeStats() {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 400);
-
   useEffect(() => {
     setLoading(true);
     api
@@ -24,7 +22,6 @@ export default function EmployeeStats() {
       .catch((err) => setError(err.response?.data?.message || 'Failed to load employee stats.'))
       .finally(() => setLoading(false));
   }, []);
-
   const filteredEmployees = useMemo(() => {
     const term = debouncedSearch.trim().toLowerCase();
     if (!term) return employees;
@@ -36,14 +33,21 @@ export default function EmployeeStats() {
       );
     });
   }, [employees, debouncedSearch]);
-
   return (
     <PageShell
       title={isAdmin ? 'Employee Stats' : 'My Team'}
-      subtitle={isAdmin ? 'Task load and status breakdown for every employee.' : 'Task load and status breakdown for your team.'}
+      subtitle={
+        isAdmin
+          ? 'Task load and status breakdown for every employee.'
+          : 'Task load and status breakdown for your team.'
+      }
     >
       {!loading && !error && employees.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <div
+          style={{
+            marginBottom: 16,
+          }}
+        >
           <input
             type="text"
             value={search}
@@ -62,7 +66,16 @@ export default function EmployeeStats() {
         </div>
       )}
 
-      {loading && <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>Loading team stats…</div>}
+      {loading && (
+        <div
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 14,
+          }}
+        >
+          Loading team stats…
+        </div>
+      )}
 
       {error && (
         <div
@@ -90,7 +103,9 @@ export default function EmployeeStats() {
             fontSize: 14,
           }}
         >
-          {isAdmin ? 'No employee accounts yet. Create one from Team & Access.' : 'No employees report to you yet.'}
+          {isAdmin
+            ? 'No employee accounts yet. Create one from Team & Access.'
+            : 'No employees report to you yet.'}
         </div>
       )}
 

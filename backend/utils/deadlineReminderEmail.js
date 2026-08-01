@@ -1,5 +1,3 @@
-// Same day-counting logic used on the frontend, kept in sync so the number
-// a user sees in their email matches what they see in the app.
 function daysRemaining(deadline) {
   const now = new Date();
   const due = new Date(deadline);
@@ -8,7 +6,6 @@ function daysRemaining(deadline) {
   const startOfDue = new Date(due.getFullYear(), due.getMonth(), due.getDate());
   return Math.round((startOfDue - startOfNow) / msPerDay);
 }
-
 function formatDaysRemaining(deadline) {
   const days = daysRemaining(deadline);
   if (days < 0) return `${Math.abs(days)} day${Math.abs(days) === 1 ? '' : 's'} overdue`;
@@ -16,7 +13,6 @@ function formatDaysRemaining(deadline) {
   if (days === 1) return '1 day left';
   return `${days} days left`;
 }
-
 const STATUS_LABELS = {
   todo: 'To Do',
   'in-progress': 'In Progress',
@@ -24,7 +20,6 @@ const STATUS_LABELS = {
   cancelled: 'Cancelled',
   hold: 'On Hold',
 };
-
 function buildReminderEmail(user, tasks) {
   const rows = tasks
     .map((t) => {
@@ -40,7 +35,6 @@ function buildReminderEmail(user, tasks) {
         </tr>`;
     })
     .join('');
-
   const html = `
     <div style="font-family:Arial,Helvetica,sans-serif;color:#222;max-width:640px;margin:0 auto;">
       <h2 style="color:#111;margin-bottom:4px;">Hi ${escapeHtml(user.name)},</h2>
@@ -61,7 +55,6 @@ function buildReminderEmail(user, tasks) {
         This is an automated daily reminder from TaskFlow. Log in to update the status of these tasks.
       </p>
     </div>`;
-
   const text = [
     `Hi ${user.name},`,
     '',
@@ -69,26 +62,22 @@ function buildReminderEmail(user, tasks) {
     '',
     ...tasks.map(
       (t) =>
-        `- ${t.title} (${t.projectName}) — ${STATUS_LABELS[t.status] || t.status} — due ${new Date(
-          t.deadline
-        ).toDateString()} — ${formatDaysRemaining(t.deadline)}`
+        `- ${t.title} (${t.projectName}) — ${STATUS_LABELS[t.status] || t.status} — due ${new Date(t.deadline).toDateString()} — ${formatDaysRemaining(t.deadline)}`
     ),
     '',
     'Log in to TaskFlow to update these tasks.',
   ].join('\n');
-
   return {
     subject: `TaskFlow: ${tasks.length} task${tasks.length === 1 ? '' : 's'} need${tasks.length === 1 ? 's' : ''} your attention`,
     html,
     text,
   };
 }
-
 function escapeHtml(str = '') {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-
-module.exports = { buildReminderEmail, formatDaysRemaining, daysRemaining };
+module.exports = {
+  buildReminderEmail,
+  formatDaysRemaining,
+  daysRemaining,
+};

@@ -11,7 +11,6 @@ import KanbanBoard from './pages/KanbanBoard';
 import CalendarView from './pages/CalendarView';
 import Notes from './pages/Notes';
 import ProtectedRoute from './components/ProtectedRoute';
-
 export default function App() {
   return (
     <Routes>
@@ -96,7 +95,14 @@ export default function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="*" element={<ProtectedRoute><Overview /></ProtectedRoute>} />
+      <Route
+        path="*"
+        element={
+          <ProtectedRoute>
+            <Overview />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

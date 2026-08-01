@@ -6,36 +6,32 @@ import { ProjectStatusBadge } from '../components/ProjectStatusBadge';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
-
 export default function Projects() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const isAdmin = user.role === 'admin';
-
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 400);
-
   const load = async () => {
     setLoading(true);
     try {
       const params = {};
       if (debouncedSearch) params.search = debouncedSearch;
-      const res = await api.get('/projects', { params });
+      const res = await api.get('/projects', {
+        params,
+      });
       setProjects(res.data);
     } finally {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
-
   const handleSubmit = async (form, projectId) => {
     if (projectId) {
       await api.put(`/projects/${projectId}`, form);
@@ -43,7 +39,6 @@ export default function Projects() {
       await api.post('/projects', form);
     }
   };
-
   const handleDelete = async (project) => {
     if (!window.confirm(`Delete "${project.name}"? This cannot be undone.`)) return;
     try {
@@ -53,7 +48,6 @@ export default function Projects() {
       alert(err.response?.data?.message || 'Failed to delete project');
     }
   };
-
   return (
     <PageShell
       title="Projects"
@@ -81,7 +75,11 @@ export default function Projects() {
         )
       }
     >
-      <div style={{ marginBottom: 16 }}>
+      <div
+        style={{
+          marginBottom: 16,
+        }}
+      >
         <input
           type="text"
           value={search}
@@ -99,7 +97,16 @@ export default function Projects() {
         />
       </div>
 
-      {loading && <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>Loading projects…</div>}
+      {loading && (
+        <div
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 14,
+          }}
+        >
+          Loading projects…
+        </div>
+      )}
 
       {!loading && projects.length === 0 && (
         <div
@@ -112,7 +119,9 @@ export default function Projects() {
             fontSize: 14,
           }}
         >
-          {search ? 'No projects match your search.' : (
+          {search ? (
+            'No projects match your search.'
+          ) : (
             <>No projects yet.{isAdmin ? ' Create one to start assigning tasks.' : ''}</>
           )}
         </div>
@@ -127,26 +136,34 @@ export default function Projects() {
           }}
         >
           {projects.map((p) => (
-            <div
-              key={p._id}
-              onClick={() => navigate(`/projects/${p._id}`)}
-              className="project-card"
-              // style={{
-              //   background: 'var(--bg-panel)',
-              //   border: '1px solid var(--border-hairline-soft)',
-              //   borderRadius: 'var(--radius-lg)',
-              //   padding: 18,
-              //   display: 'flex',
-              //   flexDirection: 'column',
-              //   gap: 10,
-              //   minWidth: 0,
-              //   cursor: 'pointer',
-              // }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
-                <div style={{ fontWeight: 700, fontSize: 15.5, color: 'var(--text-primary)', minWidth: 0 }}>{p.name}</div>
+            <div key={p._id} onClick={() => navigate(`/projects/${p._id}`)} className="project-card">
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  gap: 10,
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 15.5,
+                    color: 'var(--text-primary)',
+                    minWidth: 0,
+                  }}
+                >
+                  {p.name}
+                </div>
                 {isAdmin && (
-                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 6,
+                      flexShrink: 0,
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <button
                       onClick={() => {
                         setEditingProject(p);
@@ -156,7 +173,13 @@ export default function Projects() {
                     >
                       Edit
                     </button>
-                    <button onClick={() => handleDelete(p)} style={{ ...iconBtnStyle, color: 'var(--status-cancelled)' }}>
+                    <button
+                      onClick={() => handleDelete(p)}
+                      style={{
+                        ...iconBtnStyle,
+                        color: 'var(--status-cancelled)',
+                      }}
+                    >
                       Delete
                     </button>
                   </div>
@@ -192,7 +215,9 @@ export default function Projects() {
                   color: 'var(--text-muted)',
                 }}
               >
-                <span className="mono">{p.milestones?.length || 0} milestone{p.milestones?.length === 1 ? '' : 's'}</span>
+                <span className="mono">
+                  {p.milestones?.length || 0} milestone{p.milestones?.length === 1 ? '' : 's'}
+                </span>
                 {p.client && <span>{p.client}</span>}
               </div>
             </div>
@@ -201,9 +226,18 @@ export default function Projects() {
       )}
 
       <style>{`
+        .project-card {
+          transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+        }
         .project-card:hover {
           background: var(--bg-panel-raised);
           border-color: var(--border-hairline);
+        }
+        [data-theme='light'] .project-card:hover {
+          background: var(--bg-panel);
+          border-color: var(--border-hairline);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
       `}</style>
 
@@ -221,7 +255,6 @@ export default function Projects() {
     </PageShell>
   );
 }
-
 const iconBtnStyle = {
   background: 'transparent',
   border: '1px solid var(--border-hairline)',

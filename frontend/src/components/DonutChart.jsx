@@ -1,18 +1,35 @@
-// Hand-built SVG donut so the app doesn't need a charting library dependency.
-// segments: [{ label, value, color }]
 export default function DonutChart({ segments, size = 160, thickness = 20, centerLabel, centerSubLabel }) {
   const total = segments.reduce((sum, s) => sum + s.value, 0);
   const radius = (size - thickness) / 2;
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
-
   let cumulative = 0;
-
   return (
-    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
-      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }} role="img" aria-label="Donut chart">
-        {/* Base track so an empty state still reads as a ring, not nothing */}
-        <circle cx={center} cy={center} r={radius} fill="none" stroke="var(--bg-inset)" strokeWidth={thickness} />
+    <div
+      style={{
+        position: 'relative',
+        width: size,
+        height: size,
+        flexShrink: 0,
+      }}
+    >
+      <svg
+        width={size}
+        height={size}
+        style={{
+          transform: 'rotate(-90deg)',
+        }}
+        role="img"
+        aria-label="Donut chart"
+      >
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="none"
+          stroke="var(--bg-inset)"
+          strokeWidth={thickness}
+        />
 
         {total > 0 &&
           segments
@@ -54,12 +71,28 @@ export default function DonutChart({ segments, size = 160, thickness = 20, cente
           }}
         >
           {centerLabel && (
-            <span className="mono" style={{ fontSize: 26, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1 }}>
+            <span
+              className="mono"
+              style={{
+                fontSize: 26,
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                lineHeight: 1,
+              }}
+            >
               {centerLabel}
             </span>
           )}
           {centerSubLabel && (
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{centerSubLabel}</span>
+            <span
+              style={{
+                fontSize: 11,
+                color: 'var(--text-muted)',
+                marginTop: 4,
+              }}
+            >
+              {centerSubLabel}
+            </span>
           )}
         </div>
       )}

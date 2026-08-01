@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
-
 const NOTICE_PRIORITY = ['normal', 'important', 'urgent'];
-
 const noticeSchema = new mongoose.Schema(
   {
     title: {
@@ -29,10 +27,13 @@ const noticeSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
-
-noticeSchema.index({ pinned: -1, createdAt: -1 });
+noticeSchema.index({
+  pinned: -1,
+  createdAt: -1,
+});
 noticeSchema.statics.PRIORITY_VALUES = NOTICE_PRIORITY;
-
 module.exports = mongoose.model('Notice', noticeSchema);

@@ -1,23 +1,19 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import api from '../api/axios';
 import { useAuth } from './AuthContext';
-
 const TimerContext = createContext(null);
-
 export function TimerProvider({ children }) {
   const { user } = useAuth();
   const [activeEntry, setActiveEntry] = useState(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [loading, setLoading] = useState(true);
   const intervalRef = useRef(null);
-
   const clearTick = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
   };
-
   const startTick = (startTime) => {
     clearTick();
     const startMs = new Date(startTime).getTime();
@@ -25,9 +21,6 @@ export function TimerProvider({ children }) {
     tick();
     intervalRef.current = setInterval(tick, 1000);
   };
-
-  // On login (or page refresh), check if this user already has a timer
-  // running from before, so the counter picks up exactly where it left off.
   useEffect(() => {
     if (!user) {
       setLoading(false);
@@ -44,18 +37,17 @@ export function TimerProvider({ children }) {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-
     return () => clearTick();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id]);
-
   const startTimer = useCallback(async (taskId, note) => {
-    const res = await api.post('/time-entries/start', { taskId, note });
+    const res = await api.post('/time-entries/start', {
+      taskId,
+      note,
+    });
     setActiveEntry(res.data);
     startTick(res.data.startTime);
     return res.data;
   }, []);
-
   const stopTimer = useCallback(async () => {
     if (!activeEntry) return null;
     const res = await api.patch(`/time-entries/${activeEntry._id}/stop`);
@@ -64,14 +56,20 @@ export function TimerProvider({ children }) {
     setElapsedSeconds(0);
     return res.data;
   }, [activeEntry]);
-
   return (
-    <TimerContext.Provider value={{ activeEntry, elapsedSeconds, loading, startTimer, stopTimer }}>
+    <TimerContext.Provider
+      value={{
+        activeEntry,
+        elapsedSeconds,
+        loading,
+        startTimer,
+        stopTimer,
+      }}
+    >
       {children}
     </TimerContext.Provider>
   );
 }
-
 export function useTimer() {
   const ctx = useContext(TimerContext);
   if (!ctx) throw new Error('useTimer must be used within a TimerProvider');

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -27,18 +26,10 @@ const userSchema = new mongoose.Schema(
       enum: ['admin', 'manager', 'employee'],
       default: 'employee',
     },
-    // The single "root" admin account. Only this user can create/delete other
-    // admin accounts and change another admin's password - regular admins
-    // manage managers/employees but can't touch each other's admin access.
     isMainAdmin: {
       type: Boolean,
       default: false,
     },
-    // Who this person reports to. Only meaningful for employees (an employee
-    // reports to one manager); managers/admins leave this null.
-    // A manager can fully manage tasks for everyone whose `manager` points
-    // at them, but cannot touch user accounts or projects - that stays
-    // admin-only.
     manager: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -49,9 +40,6 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
-    // Minimum project-value target for this employee, shown against their
-    // actual in-progress/delivered totals on the Employee Stats page.
-    // Only meaningful for employees; managers/admins leave this null.
     minimumTarget: {
       type: Number,
       min: 0,
@@ -62,20 +50,19 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
-
 userSchema.pre('save', async function hashPassword(next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
-
 userSchema.methods.comparePassword = async function comparePassword(candidate) {
   return bcrypt.compare(candidate, this.password);
 };
-
 userSchema.methods.toSafeObject = function toSafeObject() {
   return {
     _id: this._id,
@@ -90,5 +77,4 @@ userSchema.methods.toSafeObject = function toSafeObject() {
     createdAt: this.createdAt,
   };
 };
-
 module.exports = mongoose.model('User', userSchema);

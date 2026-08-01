@@ -10,7 +10,6 @@ import StatusTasksModal from '../components/StatusTasksModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { canManageTasks } from '../utils/roles';
-
 export default function Overview() {
   const { user } = useAuth();
   const isManager = canManageTasks(user.role);
@@ -19,7 +18,6 @@ export default function Overview() {
   const [loading, setLoading] = useState(true);
   const [detailTaskId, setDetailTaskId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
-
   const load = async () => {
     setLoading(true);
     try {
@@ -33,32 +31,69 @@ export default function Overview() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     load();
   }, []);
-
   return (
     <PageShell
       title={`Welcome back, ${user.name.split(' ')[0]}`}
-      subtitle={isManager ? "Here's how the team's work is tracking today." : "Here's what's on your plate today."}
+      subtitle={
+        isManager ? "Here's how the team's work is tracking today." : "Here's what's on your plate today."
+      }
     >
-
       <StatsCards
         stats={stats}
         loading={loading}
-        onCardClick={(statusKey, statusLabel) => setSelectedStatus({ key: statusKey, label: statusLabel })}
+        onCardClick={(statusKey, statusLabel) =>
+          setSelectedStatus({
+            key: statusKey,
+            label: statusLabel,
+          })
+        }
       />
 
-      <div style={{ marginBottom: 28 }}>
+      <div
+        style={{
+          marginBottom: 28,
+        }}
+      >
         <TaskCompletionDonut stats={stats} loading={loading} />
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, margin: 0 }}>
-          Deadline Watch <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>· due in 3 days or less</span>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 14,
+        }}
+      >
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 16,
+            fontWeight: 700,
+            margin: 0,
+          }}
+        >
+          Deadline Watch{' '}
+          <span
+            style={{
+              color: 'var(--text-muted)',
+              fontWeight: 500,
+            }}
+          >
+            · due in 3 days or less
+          </span>
         </h2>
-        <Link to="/deadlines" style={{ fontSize: 13, color: 'var(--accent-cyan)', fontWeight: 600 }}>
+        <Link
+          to="/deadlines"
+          style={{
+            fontSize: 13,
+            color: 'var(--accent-cyan)',
+            fontWeight: 600,
+          }}
+        >
           View all →
         </Link>
       </div>
@@ -72,7 +107,12 @@ export default function Overview() {
         />
       </div>
 
-      <div className="notice-board" style={{ marginTop: 28 }}>
+      <div
+        className="notice-board"
+        style={{
+          marginTop: 28,
+        }}
+      >
         <NoticeBoard />
       </div>
 

@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
-
 const STATUS_VALUES = ['todo', 'in-progress', 'delivered', 'cancelled', 'hold'];
-
 const taskSchema = new mongoose.Schema(
   {
     title: {
@@ -54,19 +52,34 @@ const taskSchema = new mongoose.Schema(
     },
     statusHistory: [
       {
-        status: { type: String, enum: STATUS_VALUES },
-        changedAt: { type: Date, default: Date.now },
-        changedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        status: {
+          type: String,
+          enum: STATUS_VALUES,
+        },
+        changedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        changedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+        },
       },
     ],
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
-
-taskSchema.index({ assignedTo: 1, status: 1 });
-taskSchema.index({ deadline: 1 });
-taskSchema.index({ project: 1 });
-
+taskSchema.index({
+  assignedTo: 1,
+  status: 1,
+});
+taskSchema.index({
+  deadline: 1,
+});
+taskSchema.index({
+  project: 1,
+});
 taskSchema.statics.STATUS_VALUES = STATUS_VALUES;
-
 module.exports = mongoose.model('Task', taskSchema);

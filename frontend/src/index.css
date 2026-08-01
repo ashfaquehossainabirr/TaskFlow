@@ -27,6 +27,7 @@
   --text-info: #7ec8ff;
 
   --overlay-scrim: rgba(6, 9, 13, 0.65);
+  --shadow-card-hover: 0 10px 24px -12px rgba(0, 0, 0, 0.35);
 
   --chip-overdue-bg: rgba(239, 100, 97, 0.14);
   --chip-overdue-border: rgba(239, 100, 97, 0.4);
@@ -55,8 +56,7 @@
   --text-primary: #171f27;
   --text-secondary: #4d5c6a;
   --text-muted: #85929e;
-  /* Light theme's accent-cyan is a darker, more saturated teal than dark
-     theme's — near-black text on it loses contrast, so use white instead. */
+  
   --text-on-accent: #ffffff;
 
   --accent-cyan: #0891a3;
@@ -75,6 +75,7 @@
   --text-info: #1d4ed8;
 
   --overlay-scrim: rgba(23, 31, 39, 0.5);
+  --shadow-card-hover: 0 10px 20px -14px rgba(23, 31, 39, 0.22);
 
   --chip-overdue-bg: rgba(214, 71, 63, 0.2);
   --chip-overdue-border: rgba(214, 71, 63, 0.55);
@@ -142,7 +143,6 @@ button:disabled {
   color: var(--text-primary);
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -158,7 +158,6 @@ button:disabled {
   background: var(--text-muted);
 }
 
-/* Focus visibility for accessibility */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
@@ -177,8 +176,6 @@ textarea:focus-visible {
   font-family: var(--font-mono);
   letter-spacing: -0.01em;
 }
-
-/* Other Pages Styles */
 
 .project-card {
   background: var(--bg-panel);

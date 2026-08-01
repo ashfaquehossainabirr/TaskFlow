@@ -5,7 +5,6 @@ import ActiveTimerBar from './ActiveTimerBar';
 import ThemeToggle from './ThemeToggle';
 import Modal from './Modal';
 import { canManageTasks } from '../utils/roles';
-
 const linkStyle = ({ isActive }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -18,29 +17,36 @@ const linkStyle = ({ isActive }) => ({
   background: isActive ? 'var(--bg-panel-raised)' : 'transparent',
   border: isActive ? '1px solid var(--border-hairline)' : '1px solid transparent',
 });
-
-// isOpen / onClose control the mobile slide-in drawer. On desktop the
-// sidebar is always visible and these props have no visual effect.
 export default function Sidebar({ isOpen, onClose }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const isAdmin = user?.role === 'admin';
   const isManager = canManageTasks(user?.role);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
-  // Auto-close the mobile drawer whenever the user navigates to a new page.
   useEffect(() => {
     onClose && onClose();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
-
   return (
     <>
       {isOpen && <div className="sidebar-overlay" onClick={onClose} />}
 
       <aside className={`sidebar${isOpen ? ' sidebar-open' : ''}`}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 8px 26px', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '4px 8px 26px',
+            flexShrink: 0,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 9,
+            }}
+          >
             <div
               style={{
                 width: 26,
@@ -58,7 +64,14 @@ export default function Sidebar({ isOpen, onClose }) {
             >
               T
             </div>
-            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 17, letterSpacing: '-0.01em' }}>
+            <span
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 700,
+                fontSize: 17,
+                letterSpacing: '-0.01em',
+              }}
+            >
               TaskFlow
             </span>
           </div>
@@ -67,7 +80,14 @@ export default function Sidebar({ isOpen, onClose }) {
           </button>
         </div>
 
-        <nav className="sidebar-nav" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <nav
+          className="sidebar-nav"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+          }}
+        >
           <NavLink to="/" end style={linkStyle}>
             Overview
           </NavLink>
@@ -101,13 +121,39 @@ export default function Sidebar({ isOpen, onClose }) {
           )}
         </nav>
 
-        <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid var(--border-hairline-soft)', flexShrink: 0 }}>
+        <div
+          style={{
+            marginTop: 'auto',
+            paddingTop: 16,
+            borderTop: '1px solid var(--border-hairline-soft)',
+            flexShrink: 0,
+          }}
+        >
           <ActiveTimerBar />
-          <div style={{ marginBottom: 10 }}>
+          <div
+            style={{
+              marginBottom: 10,
+            }}
+          >
             <ThemeToggle />
           </div>
-          <div style={{ padding: '8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{user?.name}</span>
+          <div
+            style={{
+              padding: '8px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+              }}
+            >
+              {user?.name}
+            </span>
             <span
               className="mono"
               style={{
@@ -116,8 +162,8 @@ export default function Sidebar({ isOpen, onClose }) {
                   user?.role === 'admin'
                     ? 'var(--accent-cyan)'
                     : user?.role === 'manager'
-                    ? 'var(--status-hold)'
-                    : 'var(--text-muted)',
+                      ? 'var(--status-hold)'
+                      : 'var(--text-muted)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.06em',
               }}
@@ -147,10 +193,24 @@ export default function Sidebar({ isOpen, onClose }) {
 
       {showLogoutConfirm && (
         <Modal title="Sign out?" onClose={() => setShowLogoutConfirm(false)} width={360}>
-          <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: 0, marginBottom: 20 }}>
+          <p
+            style={{
+              fontSize: 14,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.6,
+              marginTop: 0,
+              marginBottom: 20,
+            }}
+          >
             You'll need to log back in with your email and password to continue.
           </p>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 10,
+            }}
+          >
             <button
               onClick={() => setShowLogoutConfirm(false)}
               style={{

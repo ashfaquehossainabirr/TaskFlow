@@ -1,20 +1,15 @@
 import { useState } from 'react';
 import Modal from './Modal';
 import { fieldWrap, labelStyle, inputStyle, primaryBtn, secondaryBtn, errorBanner } from './formStyles';
-
 export default function UserFormModal({ user, managers, currentUser, onClose, onSaved, onSubmit }) {
   const isEdit = Boolean(user);
   const isSelf = isEdit && String(user._id) === String(currentUser._id);
   const targetIsAdmin = isEdit && user.role === 'admin';
   const targetIsMainAdmin = isEdit && Boolean(user.isMainAdmin);
   const viewerIsMainAdmin = Boolean(currentUser.isMainAdmin);
-
-  // Only the main admin can promote someone to admin, demote an existing
-  // admin, or change another admin's password.
   const canEditRole = viewerIsMainAdmin || !targetIsAdmin;
   const showAdminRoleOption = viewerIsMainAdmin || targetIsAdmin;
   const canEditPassword = isSelf || !targetIsAdmin || viewerIsMainAdmin;
-
   const [form, setForm] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -28,16 +23,17 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
   });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-
   const update = (key) => (e) =>
     setForm((f) => ({
       ...f,
       [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
-      // Manager assignment and target only make sense for employees - clear
-      // them out the moment the role changes to anything else.
-      ...(key === 'role' && e.target.value !== 'employee' ? { manager: '', minimumTarget: '' } : {}),
+      ...(key === 'role' && e.target.value !== 'employee'
+        ? {
+            manager: '',
+            minimumTarget: '',
+          }
+        : {}),
     }));
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -54,7 +50,7 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
           form.role === 'employee' && form.minimumTarget !== '' ? Number(form.minimumTarget) : null,
       };
       if (isEdit && !payload.password) delete payload.password;
-      if (isEdit && !canEditRole) delete payload.role; // locked in the UI, don't send a role the server would reject anyway
+      if (isEdit && !canEditRole) delete payload.role;
       if (!payload.makeMainAdmin) delete payload.isMainAdmin;
       else payload.isMainAdmin = true;
       delete payload.makeMainAdmin;
@@ -66,7 +62,6 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
       setSaving(false);
     }
   };
-
   return (
     <Modal title={isEdit ? 'Edit user' : 'Create new user'} onClose={onClose} width={460}>
       <style>{`
@@ -86,20 +81,47 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
 
         <div style={fieldWrap}>
           <label style={labelStyle}>Full name</label>
-          <input style={inputStyle} value={form.name} onChange={update('name')} placeholder="e.g. Jordan Lee" />
+          <input
+            style={inputStyle}
+            value={form.name}
+            onChange={update('name')}
+            placeholder="e.g. Jordan Lee"
+          />
         </div>
 
         <div style={fieldWrap}>
           <label style={labelStyle}>Email</label>
-          <input type="email" style={inputStyle} value={form.email} onChange={update('email')} placeholder="jordan@company.com" />
+          <input
+            type="email"
+            style={inputStyle}
+            value={form.email}
+            onChange={update('email')}
+            placeholder="jordan@company.com"
+          />
         </div>
 
         <div style={fieldWrap}>
-          <label style={labelStyle}>{isEdit ? 'New password (leave blank to keep current)' : 'Password'}</label>
+          <label style={labelStyle}>
+            {isEdit ? 'New password (leave blank to keep current)' : 'Password'}
+          </label>
           {canEditPassword ? (
-            <input type="password" style={inputStyle} value={form.password} onChange={update('password')} placeholder="Min. 6 characters" />
+            <input
+              type="password"
+              style={inputStyle}
+              value={form.password}
+              onChange={update('password')}
+              placeholder="Min. 6 characters"
+            />
           ) : (
-            <div style={{ ...inputStyle, color: 'var(--text-muted)', fontSize: 12.5, display: 'flex', alignItems: 'center' }}>
+            <div
+              style={{
+                ...inputStyle,
+                color: 'var(--text-muted)',
+                fontSize: 12.5,
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
               Only the main admin can change another admin&rsquo;s password.
             </div>
           )}
@@ -114,14 +136,25 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
               {showAdminRoleOption && <option value="admin">Admin</option>}
             </select>
             {!canEditRole && (
-              <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>
+              <div
+                style={{
+                  fontSize: 11.5,
+                  color: 'var(--text-muted)',
+                  marginTop: 4,
+                }}
+              >
                 Only the main admin can change a user into or out of the admin role.
               </div>
             )}
           </div>
           <div style={fieldWrap}>
             <label style={labelStyle}>Department</label>
-            <input style={inputStyle} value={form.department} onChange={update('department')} placeholder="e.g. Engineering" />
+            <input
+              style={inputStyle}
+              value={form.department}
+              onChange={update('department')}
+              placeholder="e.g. Engineering"
+            />
           </div>
         </div>
 
@@ -154,20 +187,45 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
         )}
 
         {isEdit && (
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, color: 'var(--text-secondary)', marginBottom: 4 }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: 13.5,
+              color: 'var(--text-secondary)',
+              marginBottom: 4,
+            }}
+          >
             <input type="checkbox" checked={form.isActive} onChange={update('isActive')} />
             Account is active
           </label>
         )}
 
         {isEdit && viewerIsMainAdmin && !isSelf && form.role === 'admin' && !targetIsMainAdmin && (
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, color: 'var(--text-secondary)', marginBottom: 4 }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: 13.5,
+              color: 'var(--text-secondary)',
+              marginBottom: 4,
+            }}
+          >
             <input type="checkbox" checked={form.makeMainAdmin} onChange={update('makeMainAdmin')} />
             Make this the main admin account (this will remove main admin status from your own account)
           </label>
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 10,
+            marginTop: 20,
+          }}
+        >
           <button type="button" style={secondaryBtn} onClick={onClose}>
             Cancel
           </button>

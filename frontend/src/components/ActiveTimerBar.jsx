@@ -1,11 +1,8 @@
 import { useTimer } from '../context/TimerContext';
 import { formatStopwatch } from '../utils/time';
-
 export default function ActiveTimerBar() {
   const { activeEntry, elapsedSeconds, stopTimer } = useTimer();
-
   if (!activeEntry) return null;
-
   const handleStop = async () => {
     try {
       await stopTimer();
@@ -13,7 +10,6 @@ export default function ActiveTimerBar() {
       alert(err.response?.data?.message || 'Failed to stop timer');
     }
   };
-
   return (
     <div
       style={{
@@ -63,8 +59,21 @@ export default function ActiveTimerBar() {
       >
         {activeEntry.task?.title || 'Task'}
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span className="mono" style={{ fontSize: 16, fontWeight: 700, color: 'var(--accent-cyan)' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <span
+          className="mono"
+          style={{
+            fontSize: 16,
+            fontWeight: 700,
+            color: 'var(--accent-cyan)',
+          }}
+        >
           {formatStopwatch(elapsedSeconds)}
         </span>
         <button

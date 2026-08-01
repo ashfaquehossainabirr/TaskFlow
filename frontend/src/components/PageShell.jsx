@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import Sidebar from './Sidebar';
-
 export default function PageShell({ title, subtitle, actions, children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
     <div className="page-shell">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -22,10 +20,28 @@ export default function PageShell({ title, subtitle, actions, children }) {
           <div>
             <h1 className="page-title">{title}</h1>
             {subtitle && (
-              <p style={{ margin: '6px 0 0', color: 'var(--text-secondary)', fontSize: 14 }}>{subtitle}</p>
+              <p
+                style={{
+                  margin: '6px 0 0',
+                  color: 'var(--text-secondary)',
+                  fontSize: 14,
+                }}
+              >
+                {subtitle}
+              </p>
             )}
           </div>
-          {actions && <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>{actions}</div>}
+          {actions && (
+            <div
+              style={{
+                display: 'flex',
+                gap: 10,
+                flexWrap: 'wrap',
+              }}
+            >
+              {actions}
+            </div>
+          )}
         </div>
         {children}
       </main>

@@ -1,11 +1,30 @@
 const CARDS = [
-  { key: 'todo', label: 'To Do', color: 'var(--status-todo)' },
-  { key: 'in-progress', label: 'In Progress', color: 'var(--status-progress)' },
-  { key: 'hold', label: 'On Hold', color: 'var(--status-hold)' },
-  { key: 'delivered', label: 'Delivered', color: 'var(--status-delivered)' },
-  { key: 'cancelled', label: 'Cancelled', color: 'var(--status-cancelled)' },
+  {
+    key: 'todo',
+    label: 'To Do',
+    color: 'var(--status-todo)',
+  },
+  {
+    key: 'in-progress',
+    label: 'In Progress',
+    color: 'var(--status-progress)',
+  },
+  {
+    key: 'hold',
+    label: 'On Hold',
+    color: 'var(--status-hold)',
+  },
+  {
+    key: 'delivered',
+    label: 'Delivered',
+    color: 'var(--status-delivered)',
+  },
+  {
+    key: 'cancelled',
+    label: 'Cancelled',
+    color: 'var(--status-cancelled)',
+  },
 ];
-
 export default function StatsCards({ stats, loading, onCardClick }) {
   return (
     <div
@@ -80,9 +99,14 @@ export default function StatsCards({ stats, loading, onCardClick }) {
           </div>
           <div
             className="mono stat-card-value"
-            style={{ fontSize: 30, fontWeight: 600, color: 'var(--text-primary)', transition: 'color 0.18s ease' }}
+            style={{
+              fontSize: 30,
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              transition: 'color 0.18s ease',
+            }}
           >
-            {loading ? '—' : stats?.[c.key] ?? 0}
+            {loading ? '—' : (stats?.[c.key] ?? 0)}
           </div>
         </div>
       ))}

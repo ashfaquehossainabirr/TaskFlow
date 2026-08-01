@@ -8,11 +8,9 @@ import api from '../api/axios';
 import { STATUS_LABELS } from '../utils/deadline';
 import { canManageTasks } from '../utils/roles';
 import useDebounce from '../hooks/useDebounce';
-
 export default function Tasks() {
   const { user } = useAuth();
   const isManager = canManageTasks(user.role);
-
   const [tasks, setTasks] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -21,12 +19,10 @@ export default function Tasks() {
   const [projectFilter, setProjectFilter] = useState('');
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 400);
-
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [detailTaskId, setDetailTaskId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
-
   const loadTasks = async () => {
     setLoading(true);
     try {
@@ -34,46 +30,55 @@ export default function Tasks() {
       if (statusFilter) params.status = statusFilter;
       if (projectFilter) params.project = projectFilter;
       if (debouncedSearch) params.search = debouncedSearch;
-      const res = await api.get('/tasks', { params });
+      const res = await api.get('/tasks', {
+        params,
+      });
       setTasks(res.data);
     } finally {
       setLoading(false);
     }
   };
-
   const loadEmployees = async () => {
     if (!isManager) return;
-    const res = await api.get('/users', { params: { role: 'employee' } });
+    const res = await api.get('/users', {
+      params: {
+        role: 'employee',
+      },
+    });
     setEmployees(res.data);
   };
-
   const loadProjects = async () => {
     const res = await api.get('/projects');
     setProjects(res.data);
   };
-
   useEffect(() => {
     loadEmployees();
     loadProjects();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   useEffect(() => {
     loadTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, projectFilter, debouncedSearch]);
-
   const handleStatusChange = async (task, status) => {
     const prev = tasks;
-    setTasks((ts) => ts.map((t) => (t._id === task._id ? { ...t, status } : t)));
+    setTasks((ts) =>
+      ts.map((t) =>
+        t._id === task._id
+          ? {
+              ...t,
+              status,
+            }
+          : t
+      )
+    );
     try {
-      await api.patch(`/tasks/${task._id}/status`, { status });
+      await api.patch(`/tasks/${task._id}/status`, {
+        status,
+      });
     } catch (err) {
       setTasks(prev);
       alert(err.response?.data?.message || 'Failed to update status');
     }
   };
-
   const handleSubmit = async (form, taskId) => {
     if (taskId) {
       await api.put(`/tasks/${taskId}`, form);
@@ -81,7 +86,6 @@ export default function Tasks() {
       await api.post('/tasks', form);
     }
   };
-
   const handleDelete = async (task) => {
     if (!window.confirm(`Delete "${task.title}"? This cannot be undone.`)) return;
     setDeletingId(task._id);
@@ -89,10 +93,6 @@ export default function Tasks() {
       await api.delete(`/tasks/${task._id}`);
       setTasks((ts) => ts.filter((t) => t._id !== task._id));
     } catch (err) {
-      // A request can fail (timeout, dropped connection) even after the
-      // server already deleted the task. Re-sync with the server instead of
-      // trusting the failed response, so the list doesn't show a stale row
-      // or a false "failed" alert for something that actually succeeded.
       const stillExists = await api
         .get(`/tasks/${task._id}`)
         .then(() => true)
@@ -106,11 +106,14 @@ export default function Tasks() {
       setDeletingId(null);
     }
   };
-
   return (
     <PageShell
       title={isManager ? 'All Tasks' : 'My Tasks'}
-      subtitle={isManager ? 'Create, assign, and track every task across the team.' : 'Update the status of tasks assigned to you.'}
+      subtitle={
+        isManager
+          ? 'Create, assign, and track every task across the team.'
+          : 'Update the status of tasks assigned to you.'
+      }
       actions={
         isManager && (
           <button
@@ -134,7 +137,14 @@ export default function Tasks() {
         )
       }
     >
-      <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 10,
+          marginBottom: 20,
+          flexWrap: 'wrap',
+        }}
+      >
         <input
           type="text"
           value={search}

@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import Modal from './Modal';
 import { fieldWrap, labelStyle, inputStyle, primaryBtn, secondaryBtn, errorBanner } from './formStyles';
 import { STATUS_LABELS } from '../utils/deadline';
-
 const toDateInputValue = (d) => {
   if (!d) return '';
   const date = new Date(d);
@@ -10,7 +9,6 @@ const toDateInputValue = (d) => {
   const local = new Date(date.getTime() - offset * 60000);
   return local.toISOString().slice(0, 10);
 };
-
 export default function TaskFormModal({ task, employees, projects, onClose, onSaved, onSubmit }) {
   const isEdit = Boolean(task);
   const [form, setForm] = useState({
@@ -26,21 +24,20 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
   });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-
   const update = (key) => (e) =>
     setForm((f) => ({
       ...f,
       [key]: e.target.value,
-      // Changing the project invalidates whatever milestone was picked before,
-      // since milestones belong to a specific project.
-      ...(key === 'project' ? { milestone: '' } : {}),
+      ...(key === 'project'
+        ? {
+            milestone: '',
+          }
+        : {}),
     }));
-
   const availableMilestones = useMemo(() => {
     const selected = projects.find((p) => p._id === form.project);
     return selected?.milestones || [];
   }, [projects, form.project]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -63,7 +60,6 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
       setSaving(false);
     }
   };
-
   return (
     <Modal title={isEdit ? 'Edit task' : 'Create & assign task'} onClose={onClose} width={520}>
       <style>{`
@@ -83,13 +79,22 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
 
         <div style={fieldWrap}>
           <label style={labelStyle}>Task title</label>
-          <input style={inputStyle} value={form.title} onChange={update('title')} placeholder="e.g. Build login page" />
+          <input
+            style={inputStyle}
+            value={form.title}
+            onChange={update('title')}
+            placeholder="e.g. Build login page"
+          />
         </div>
 
         <div style={fieldWrap}>
           <label style={labelStyle}>Description</label>
           <textarea
-            style={{ ...inputStyle, minHeight: 72, resize: 'vertical' }}
+            style={{
+              ...inputStyle,
+              minHeight: 72,
+              resize: 'vertical',
+            }}
             value={form.description}
             onChange={update('description')}
             placeholder="Optional details about the task"
@@ -120,8 +125,8 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
                 {!form.project
                   ? 'Pick a project first'
                   : availableMilestones.length === 0
-                  ? 'No milestones on this project'
-                  : 'None'}
+                    ? 'No milestones on this project'
+                    : 'None'}
               </option>
               {availableMilestones.map((m) => (
                 <option key={m._id} value={m._id}>
@@ -188,12 +193,26 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
         </div>
 
         {projects.length === 0 && (
-          <div style={{ ...errorBanner, background: 'rgba(240, 168, 63, 0.1)', border: '1px solid rgba(240, 168, 63, 0.3)', color: 'var(--text-warning)' }}>
+          <div
+            style={{
+              ...errorBanner,
+              background: 'rgba(240, 168, 63, 0.1)',
+              border: '1px solid rgba(240, 168, 63, 0.3)',
+              color: 'var(--text-warning)',
+            }}
+          >
             No projects exist yet. Create one from the Projects page first.
           </div>
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 10,
+            marginTop: 20,
+          }}
+        >
           <button type="button" style={secondaryBtn} onClick={onClose}>
             Cancel
           </button>

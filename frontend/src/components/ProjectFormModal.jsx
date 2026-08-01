@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Modal from './Modal';
 import { fieldWrap, labelStyle, inputStyle, primaryBtn, secondaryBtn, errorBanner } from './formStyles';
 import { PROJECT_STATUS_LABELS } from './ProjectStatusBadge';
-
 const toDateInputValue = (d) => {
   if (!d) return '';
   const date = new Date(d);
@@ -10,7 +9,6 @@ const toDateInputValue = (d) => {
   const local = new Date(date.getTime() - offset * 60000);
   return local.toISOString().slice(0, 10);
 };
-
 export default function ProjectFormModal({ project, onClose, onSaved, onSubmit }) {
   const isEdit = Boolean(project);
   const [form, setForm] = useState({
@@ -23,9 +21,11 @@ export default function ProjectFormModal({ project, onClose, onSaved, onSubmit }
   });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-
-  const update = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
-
+  const update = (key) => (e) =>
+    setForm((f) => ({
+      ...f,
+      [key]: e.target.value,
+    }));
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -43,7 +43,6 @@ export default function ProjectFormModal({ project, onClose, onSaved, onSubmit }
       setSaving(false);
     }
   };
-
   return (
     <Modal title={isEdit ? 'Edit project' : 'New project'} onClose={onClose} width={520}>
       <style>{`
@@ -63,13 +62,22 @@ export default function ProjectFormModal({ project, onClose, onSaved, onSubmit }
 
         <div style={fieldWrap}>
           <label style={labelStyle}>Project name</label>
-          <input style={inputStyle} value={form.name} onChange={update('name')} placeholder="e.g. Website Revamp" />
+          <input
+            style={inputStyle}
+            value={form.name}
+            onChange={update('name')}
+            placeholder="e.g. Website Revamp"
+          />
         </div>
 
         <div style={fieldWrap}>
           <label style={labelStyle}>Description</label>
           <textarea
-            style={{ ...inputStyle, minHeight: 72, resize: 'vertical' }}
+            style={{
+              ...inputStyle,
+              minHeight: 72,
+              resize: 'vertical',
+            }}
             value={form.description}
             onChange={update('description')}
             placeholder="Optional summary of what this project covers"
@@ -79,7 +87,12 @@ export default function ProjectFormModal({ project, onClose, onSaved, onSubmit }
         <div className="form-grid-2">
           <div style={fieldWrap}>
             <label style={labelStyle}>Client (optional)</label>
-            <input style={inputStyle} value={form.client} onChange={update('client')} placeholder="e.g. Acme Corp" />
+            <input
+              style={inputStyle}
+              value={form.client}
+              onChange={update('client')}
+              placeholder="e.g. Acme Corp"
+            />
           </div>
           <div style={fieldWrap}>
             <label style={labelStyle}>Status</label>
@@ -100,11 +113,23 @@ export default function ProjectFormModal({ project, onClose, onSaved, onSubmit }
           </div>
           <div style={fieldWrap}>
             <label style={labelStyle}>Target end date</label>
-            <input type="date" style={inputStyle} value={form.targetEndDate} onChange={update('targetEndDate')} />
+            <input
+              type="date"
+              style={inputStyle}
+              value={form.targetEndDate}
+              onChange={update('targetEndDate')}
+            />
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 10,
+            marginTop: 20,
+          }}
+        >
           <button type="button" style={secondaryBtn} onClick={onClose}>
             Cancel
           </button>

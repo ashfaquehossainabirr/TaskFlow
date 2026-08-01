@@ -1,13 +1,31 @@
 import { formatMoney, exactMoney } from '../utils/currency';
-
 const MINI_STATS = [
-  { key: 'todo', label: 'To Do', color: 'var(--status-todo)' },
-  { key: 'in-progress', label: 'In Progress', color: 'var(--status-progress)' },
-  { key: 'hold', label: 'On Hold', color: 'var(--status-hold)' },
-  { key: 'delivered', label: 'Delivered', color: 'var(--status-delivered)' },
-  { key: 'cancelled', label: 'Cancelled', color: 'var(--status-cancelled)' },
+  {
+    key: 'todo',
+    label: 'To Do',
+    color: 'var(--status-todo)',
+  },
+  {
+    key: 'in-progress',
+    label: 'In Progress',
+    color: 'var(--status-progress)',
+  },
+  {
+    key: 'hold',
+    label: 'On Hold',
+    color: 'var(--status-hold)',
+  },
+  {
+    key: 'delivered',
+    label: 'Delivered',
+    color: 'var(--status-delivered)',
+  },
+  {
+    key: 'cancelled',
+    label: 'Cancelled',
+    color: 'var(--status-cancelled)',
+  },
 ];
-
 const AVATAR_PALETTE = [
   'var(--accent-cyan)',
   'var(--status-progress)',
@@ -15,20 +33,17 @@ const AVATAR_PALETTE = [
   'var(--status-delivered)',
   'var(--status-cancelled)',
 ];
-
 function hashColor(str = '') {
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
   return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
 }
-
 function initials(name = '') {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return '?';
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
-
 export default function EmployeeStatCard({ employee, onClick }) {
   const hasTarget = employee.minimumTarget !== null && employee.minimumTarget !== undefined;
   const deliveredValue = Number(employee.deliveredValue ?? 0);
@@ -36,13 +51,10 @@ export default function EmployeeStatCard({ employee, onClick }) {
   const remaining = hasTarget ? target - deliveredValue : 0;
   const achieved = hasTarget && remaining <= 0;
   const progressPct = hasTarget && target > 0 ? Math.min(100, (deliveredValue / target) * 100) : 0;
-
   const total = MINI_STATS.reduce((sum, s) => sum + Number(employee[s.key] ?? 0), 0);
   const avatarColor = hashColor(employee.name);
-
   return (
     <div onClick={onClick} className="employee-stat-card">
-      {/* Header */}
       <div className="esc-header">
         <div
           className="esc-avatar"
@@ -61,10 +73,16 @@ export default function EmployeeStatCard({ employee, onClick }) {
         {employee.department && <div className="esc-dept">{employee.department}</div>}
       </div>
 
-      {/* Headline metrics */}
       <div className="esc-headline">
         <div className="esc-headline-item">
-          <div className="esc-headline-value mono" style={{ color: 'var(--accent-cyan)' }}>{employee.projects}</div>
+          <div
+            className="esc-headline-value mono"
+            style={{
+              color: 'var(--accent-cyan)',
+            }}
+          >
+            {employee.projects}
+          </div>
           <div className="esc-headline-label">Projects</div>
         </div>
         <div className="esc-divider" />
@@ -76,14 +94,15 @@ export default function EmployeeStatCard({ employee, onClick }) {
           <>
             <div className="esc-divider" />
             <div className="esc-headline-item">
-              <div className="esc-headline-value mono" title={exactMoney(target)}>${formatMoney(target)}</div>
+              <div className="esc-headline-value mono" title={exactMoney(target)}>
+                ${formatMoney(target)}
+              </div>
               <div className="esc-headline-label">Min. Target</div>
             </div>
           </>
         )}
       </div>
 
-      {/* Status breakdown */}
       <div className="esc-section">
         <div className="esc-section-title">Task Status</div>
         {total > 0 && (
@@ -91,7 +110,10 @@ export default function EmployeeStatCard({ employee, onClick }) {
             {MINI_STATS.filter((s) => Number(employee[s.key] ?? 0) > 0).map((s) => (
               <div
                 key={s.key}
-                style={{ width: `${(Number(employee[s.key] ?? 0) / total) * 100}%`, background: s.color }}
+                style={{
+                  width: `${(Number(employee[s.key] ?? 0) / total) * 100}%`,
+                  background: s.color,
+                }}
                 title={`${s.label}: ${employee[s.key]}`}
               />
             ))}
@@ -100,7 +122,12 @@ export default function EmployeeStatCard({ employee, onClick }) {
         <div className="esc-status-grid">
           {MINI_STATS.map((s) => (
             <div key={s.key} className="esc-status-item">
-              <span className="esc-dot" style={{ background: s.color }} />
+              <span
+                className="esc-dot"
+                style={{
+                  background: s.color,
+                }}
+              />
               <span className="esc-status-count mono">{employee[s.key] ?? 0}</span>
               <span className="esc-status-label">{s.label}</span>
             </div>
@@ -108,14 +135,15 @@ export default function EmployeeStatCard({ employee, onClick }) {
         </div>
       </div>
 
-      {/* Financials */}
       <div className="esc-section">
         <div className="esc-section-title">Value Delivered</div>
         <div className="esc-value-grid">
           <div className="esc-value-item">
             <div
               className="esc-value-amount mono"
-              style={{ color: 'var(--status-progress)' }}
+              style={{
+                color: 'var(--status-progress)',
+              }}
               title={exactMoney(employee.inProgressValue ?? 0)}
             >
               ${formatMoney(employee.inProgressValue ?? 0)}
@@ -125,7 +153,9 @@ export default function EmployeeStatCard({ employee, onClick }) {
           <div className="esc-value-item">
             <div
               className="esc-value-amount mono"
-              style={{ color: 'var(--status-delivered)' }}
+              style={{
+                color: 'var(--status-delivered)',
+              }}
               title={exactMoney(deliveredValue)}
             >
               ${formatMoney(deliveredValue)}
@@ -148,7 +178,9 @@ export default function EmployeeStatCard({ employee, onClick }) {
             <div className="esc-progress-caption">
               <span
                 className="esc-progress-remaining"
-                style={{ color: achieved ? 'var(--status-delivered)' : 'var(--text-secondary)' }}
+                style={{
+                  color: achieved ? 'var(--status-delivered)' : 'var(--text-secondary)',
+                }}
                 title={achieved ? undefined : exactMoney(remaining)}
               >
                 {achieved ? 'Target achieved' : `$${formatMoney(remaining)} remaining`}
@@ -176,7 +208,10 @@ export default function EmployeeStatCard({ employee, onClick }) {
           transform: translateY(-2px);
           border-color: var(--border-hairline);
           background: var(--bg-panel-raised);
-          box-shadow: 0 10px 24px -12px rgba(0,0,0,0.35);
+          box-shadow: var(--shadow-card-hover);
+        }
+        [data-theme='light'] .employee-stat-card:hover {
+          background: var(--bg-panel);
         }
 
         .esc-header {

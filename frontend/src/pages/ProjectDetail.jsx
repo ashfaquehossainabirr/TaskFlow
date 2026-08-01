@@ -7,14 +7,11 @@ import MilestoneFormModal from '../components/MilestoneFormModal';
 import { ProjectStatusBadge, MilestoneStatusBadge } from '../components/ProjectStatusBadge';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  // Projects and milestones stay strictly admin-managed, even for managers.
   const isAdmin = user.role === 'admin';
-
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,14 +19,17 @@ export default function ProjectDetail() {
   const [detailTaskId, setDetailTaskId] = useState(null);
   const [showMilestoneForm, setShowMilestoneForm] = useState(false);
   const [editingMilestone, setEditingMilestone] = useState(null);
-
   const load = async () => {
     setLoading(true);
     setError('');
     try {
       const [projectRes, tasksRes] = await Promise.all([
         api.get(`/projects/${id}`),
-        api.get('/tasks', { params: { project: id } }),
+        api.get('/tasks', {
+          params: {
+            project: id,
+          },
+        }),
       ]);
       setProject(projectRes.data);
       setTasks(tasksRes.data);
@@ -39,23 +39,30 @@ export default function ProjectDetail() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-
   const handleStatusChange = async (task, status) => {
     const prev = tasks;
-    setTasks((ts) => ts.map((t) => (t._id === task._id ? { ...t, status } : t)));
+    setTasks((ts) =>
+      ts.map((t) =>
+        t._id === task._id
+          ? {
+              ...t,
+              status,
+            }
+          : t
+      )
+    );
     try {
-      await api.patch(`/tasks/${task._id}/status`, { status });
+      await api.patch(`/tasks/${task._id}/status`, {
+        status,
+      });
     } catch (err) {
       setTasks(prev);
       alert(err.response?.data?.message || 'Failed to update status');
     }
   };
-
   const handleMilestoneSubmit = async (form, milestoneId) => {
     if (milestoneId) {
       await api.put(`/projects/${id}/milestones/${milestoneId}`, form);
@@ -63,9 +70,9 @@ export default function ProjectDetail() {
       await api.post(`/projects/${id}/milestones`, form);
     }
   };
-
   const handleMilestoneDelete = async (milestone) => {
-    if (!window.confirm(`Delete milestone "${milestone.title}"? Tasks linked to it will be unlinked.`)) return;
+    if (!window.confirm(`Delete milestone "${milestone.title}"? Tasks linked to it will be unlinked.`))
+      return;
     try {
       const res = await api.delete(`/projects/${id}/milestones/${milestone._id}`);
       setProject(res.data);
@@ -73,7 +80,6 @@ export default function ProjectDetail() {
       alert(err.response?.data?.message || 'Failed to delete milestone');
     }
   };
-
   const handleDeleteProject = async () => {
     if (!window.confirm(`Delete "${project.name}"? This cannot be undone.`)) return;
     try {
@@ -83,15 +89,20 @@ export default function ProjectDetail() {
       alert(err.response?.data?.message || 'Failed to delete project');
     }
   };
-
   if (loading) {
     return (
       <PageShell title="Loading project…">
-        <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>Loading…</div>
+        <div
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 14,
+          }}
+        >
+          Loading…
+        </div>
       </PageShell>
     );
   }
-
   if (error || !project) {
     return (
       <PageShell title="Project not found">
@@ -110,11 +121,9 @@ export default function ProjectDetail() {
       </PageShell>
     );
   }
-
   const sortedMilestones = [...(project.milestones || [])].sort(
     (a, b) => new Date(a.dueDate) - new Date(b.dueDate)
   );
-
   return (
     <PageShell
       title={project.name}
@@ -127,32 +136,85 @@ export default function ProjectDetail() {
         )
       }
     >
-      <Link to="/projects" style={{ fontSize: 13, color: 'var(--accent-cyan)', fontWeight: 600, display: 'inline-block', marginBottom: 18 }}>
+      <Link
+        to="/projects"
+        style={{
+          fontSize: 13,
+          color: 'var(--accent-cyan)',
+          fontWeight: 600,
+          display: 'inline-block',
+          marginBottom: 18,
+        }}
+      >
         ← All projects
       </Link>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          marginBottom: 20,
+          flexWrap: 'wrap',
+        }}
+      >
         <ProjectStatusBadge status={project.status} />
         {project.startDate && (
-          <span className="mono" style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          <span
+            className="mono"
+            style={{
+              fontSize: 12,
+              color: 'var(--text-muted)',
+            }}
+          >
             Start: {new Date(project.startDate).toLocaleDateString()}
           </span>
         )}
         {project.targetEndDate && (
-          <span className="mono" style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          <span
+            className="mono"
+            style={{
+              fontSize: 12,
+              color: 'var(--text-muted)',
+            }}
+          >
             Target end: {new Date(project.targetEndDate).toLocaleDateString()}
           </span>
         )}
       </div>
 
       {project.description && (
-        <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 28, maxWidth: 720 }}>
+        <p
+          style={{
+            fontSize: 14,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.6,
+            marginBottom: 28,
+            maxWidth: 720,
+          }}
+        >
           {project.description}
         </p>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, margin: 0 }}>Milestones</h2>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 14,
+        }}
+      >
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 16,
+            fontWeight: 700,
+            margin: 0,
+          }}
+        >
+          Milestones
+        </h2>
         {isAdmin && (
           <button
             onClick={() => {
@@ -199,23 +261,63 @@ export default function ProjectDetail() {
                 justifyContent: 'space-between',
                 gap: 12,
                 padding: '14px 18px',
-                borderBottom: i === sortedMilestones.length - 1 ? 'none' : '1px solid var(--border-hairline-soft)',
+                borderBottom:
+                  i === sortedMilestones.length - 1 ? 'none' : '1px solid var(--border-hairline-soft)',
                 flexWrap: 'wrap',
               }}
             >
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{m.title}</div>
+              <div
+                style={{
+                  minWidth: 0,
+                  flex: 1,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  {m.title}
+                </div>
                 {m.description && (
-                  <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 2 }}>{m.description}</div>
+                  <div
+                    style={{
+                      fontSize: 12.5,
+                      color: 'var(--text-muted)',
+                      marginTop: 2,
+                    }}
+                  >
+                    {m.description}
+                  </div>
                 )}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                <span className="mono" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  flexShrink: 0,
+                }}
+              >
+                <span
+                  className="mono"
+                  style={{
+                    fontSize: 12,
+                    color: 'var(--text-secondary)',
+                  }}
+                >
                   Due {new Date(m.dueDate).toLocaleDateString()}
                 </span>
                 <MilestoneStatusBadge status={m.status} />
                 {isAdmin && (
-                  <div style={{ display: 'flex', gap: 6 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 6,
+                    }}
+                  >
                     <button
                       onClick={() => {
                         setEditingMilestone(m);
@@ -225,7 +327,13 @@ export default function ProjectDetail() {
                     >
                       Edit
                     </button>
-                    <button onClick={() => handleMilestoneDelete(m)} style={{ ...iconBtnStyle, color: 'var(--status-cancelled)' }}>
+                    <button
+                      onClick={() => handleMilestoneDelete(m)}
+                      style={{
+                        ...iconBtnStyle,
+                        color: 'var(--status-cancelled)',
+                      }}
+                    >
                       Delete
                     </button>
                   </div>
@@ -236,7 +344,16 @@ export default function ProjectDetail() {
         </div>
       )}
 
-      <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, marginBottom: 14 }}>Tasks in this project</h2>
+      <h2
+        style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 16,
+          fontWeight: 700,
+          marginBottom: 14,
+        }}
+      >
+        Tasks in this project
+      </h2>
       <TaskTable
         tasks={tasks}
         isAdmin={false}
@@ -261,7 +378,6 @@ export default function ProjectDetail() {
     </PageShell>
   );
 }
-
 const iconBtnStyle = {
   background: 'transparent',
   border: '1px solid var(--border-hairline)',
@@ -271,7 +387,6 @@ const iconBtnStyle = {
   fontSize: 11.5,
   cursor: 'pointer',
 };
-
 const smallPrimaryBtn = {
   background: 'var(--accent-cyan)',
   color: 'var(--text-on-accent)',
@@ -282,7 +397,6 @@ const smallPrimaryBtn = {
   fontWeight: 700,
   cursor: 'pointer',
 };
-
 const dangerBtn = {
   background: 'transparent',
   border: '1px solid rgba(239, 100, 97, 0.4)',

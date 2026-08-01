@@ -3,22 +3,33 @@ import NoticeFormModal from './NoticeFormModal';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { canManageTasks } from '../utils/roles';
-
 const PRIORITY_STYLES = {
-  normal: { label: 'Normal', color: 'var(--text-secondary)', bg: 'var(--bg-inset)', border: 'var(--border-hairline)' },
-  important: { label: 'Important', color: 'var(--status-hold)', bg: 'rgba(240, 168, 63, 0.1)', border: 'rgba(240, 168, 63, 0.3)' },
-  urgent: { label: 'Urgent', color: 'var(--status-cancelled)', bg: 'rgba(239, 100, 97, 0.1)', border: 'rgba(239, 100, 97, 0.35)' },
+  normal: {
+    label: 'Normal',
+    color: 'var(--text-secondary)',
+    bg: 'var(--bg-inset)',
+    border: 'var(--border-hairline)',
+  },
+  important: {
+    label: 'Important',
+    color: 'var(--status-hold)',
+    bg: 'rgba(240, 168, 63, 0.1)',
+    border: 'rgba(240, 168, 63, 0.3)',
+  },
+  urgent: {
+    label: 'Urgent',
+    color: 'var(--status-cancelled)',
+    bg: 'rgba(239, 100, 97, 0.1)',
+    border: 'rgba(239, 100, 97, 0.35)',
+  },
 };
-
 export default function NoticeBoard() {
   const { user } = useAuth();
   const canPost = canManageTasks(user.role);
-
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
-
   const load = async () => {
     setLoading(true);
     setError('');
@@ -31,15 +42,12 @@ export default function NoticeBoard() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     load();
   }, []);
-
   const handleSubmit = async (form) => {
     await api.post('/notices', form);
   };
-
   const handleDelete = async (notice) => {
     if (!window.confirm(`Delete the notice "${notice.title}"?`)) return;
     const prev = notices;
@@ -51,9 +59,7 @@ export default function NoticeBoard() {
       alert(err.response?.data?.message || 'Failed to delete notice.');
     }
   };
-
   const canDelete = (notice) => user.role === 'admin' || String(notice.createdBy?._id) === String(user._id);
-
   return (
     <div
       style={{
@@ -65,7 +71,16 @@ export default function NoticeBoard() {
       }}
     >
       <div className="notice-board-header">
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, margin: 0 }}>Notice Board</h2>
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 16,
+            fontWeight: 700,
+            margin: 0,
+          }}
+        >
+          Notice Board
+        </h2>
         {canPost && (
           <button
             onClick={() => setShowForm(true)}
@@ -84,7 +99,17 @@ export default function NoticeBoard() {
         )}
       </div>
 
-      {loading && <div style={{ color: 'var(--text-muted)', fontSize: 13.5, marginTop: 12 }}>Loading notices…</div>}
+      {loading && (
+        <div
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 13.5,
+            marginTop: 12,
+          }}
+        >
+          Loading notices…
+        </div>
+      )}
 
       {error && (
         <div
@@ -103,11 +128,26 @@ export default function NoticeBoard() {
       )}
 
       {!loading && !error && notices.length === 0 && (
-        <div style={{ color: 'var(--text-muted)', fontSize: 13.5, marginTop: 12 }}>No notices posted yet.</div>
+        <div
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 13.5,
+            marginTop: 12,
+          }}
+        >
+          No notices posted yet.
+        </div>
       )}
 
       {!loading && !error && notices.length > 0 && (
-        <div className="notice-list" style={{ maxHeight: "410px", overflowY: 'auto', paddingRight: "6px" }}>
+        <div
+          className="notice-list"
+          style={{
+            maxHeight: '410px',
+            overflowY: 'auto',
+            paddingRight: '6px',
+          }}
+        >
           {notices.map((n) => {
             const style = PRIORITY_STYLES[n.priority] || PRIORITY_STYLES.normal;
             return (
@@ -124,11 +164,25 @@ export default function NoticeBoard() {
                 <div className="notice-card-top">
                   <div className="notice-card-title-row">
                     {n.pinned && (
-                      <span title="Pinned" style={{ fontSize: 12, color: 'var(--accent-cyan)' }}>
+                      <span
+                        title="Pinned"
+                        style={{
+                          fontSize: 12,
+                          color: 'var(--accent-cyan)',
+                        }}
+                      >
                         📌
                       </span>
                     )}
-                    <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{n.title}</span>
+                    <span
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      {n.title}
+                    </span>
                     <span
                       style={{
                         fontSize: 10.5,
@@ -175,7 +229,12 @@ export default function NoticeBoard() {
                   {n.message}
                 </p>
 
-                <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    color: 'var(--text-muted)',
+                  }}
+                >
                   {n.createdBy?.name || 'Someone'}
                   {n.createdBy?.role ? ` · ${n.createdBy.role}` : ''} ·{' '}
                   <span className="mono">{new Date(n.createdAt).toLocaleString()}</span>

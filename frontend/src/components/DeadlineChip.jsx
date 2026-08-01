@@ -1,13 +1,36 @@
 import { formatDaysRemaining, urgencyLevel } from '../utils/deadline';
-
 const STYLES = {
-  overdue: { color: 'var(--text-error)', bg: 'var(--chip-overdue-bg)', border: 'var(--chip-overdue-border)', pulse: true },
-  urgent: { color: 'var(--text-warning)', bg: 'var(--chip-urgent-bg)', border: 'var(--chip-urgent-border)', pulse: true },
-  soon: { color: 'var(--text-info)', bg: 'var(--chip-soon-bg)', border: 'var(--chip-soon-border)', pulse: false },
-  normal: { color: 'var(--text-secondary)', bg: 'var(--bg-inset)', border: 'var(--border-hairline)', pulse: false },
-  closed: { color: 'var(--text-muted)', bg: 'var(--bg-inset)', border: 'var(--border-hairline-soft)', pulse: false },
+  overdue: {
+    color: 'var(--text-error)',
+    bg: 'var(--chip-overdue-bg)',
+    border: 'var(--chip-overdue-border)',
+    pulse: true,
+  },
+  urgent: {
+    color: 'var(--text-warning)',
+    bg: 'var(--chip-urgent-bg)',
+    border: 'var(--chip-urgent-border)',
+    pulse: true,
+  },
+  soon: {
+    color: 'var(--text-info)',
+    bg: 'var(--chip-soon-bg)',
+    border: 'var(--chip-soon-border)',
+    pulse: false,
+  },
+  normal: {
+    color: 'var(--text-secondary)',
+    bg: 'var(--bg-inset)',
+    border: 'var(--border-hairline)',
+    pulse: false,
+  },
+  closed: {
+    color: 'var(--text-muted)',
+    bg: 'var(--bg-inset)',
+    border: 'var(--border-hairline-soft)',
+    pulse: false,
+  },
 };
-
 export default function DeadlineChip({ deadline, status }) {
   const level = urgencyLevel(deadline, status);
   const s = STYLES[level];
@@ -15,7 +38,6 @@ export default function DeadlineChip({ deadline, status }) {
     month: 'short',
     day: 'numeric',
   });
-
   return (
     <span
       className="mono"

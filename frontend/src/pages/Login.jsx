@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
-
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -11,7 +10,6 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -19,22 +17,18 @@ export default function Login() {
     try {
       await login(email, password);
       const dest = location.state?.from?.pathname || '/';
-      navigate(dest, { replace: true });
+      navigate(dest, {
+        replace: true,
+      });
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to sign in. Check your credentials and try again.');
     } finally {
       setLoading(false);
     }
   };
-
   return (
-    <div
-      className="login-wrapper"
-    >
-      {/* Left panel - brand / signature */}
-      <div
-        className="login-left"
-      >
+    <div className="login-wrapper">
+      <div className="login-left">
         <div
           style={{
             position: 'absolute',
@@ -43,7 +37,14 @@ export default function Login() {
               'radial-gradient(circle at 20% 20%, rgba(79,216,224,0.12), transparent 45%), radial-gradient(circle at 80% 80%, rgba(74,158,255,0.1), transparent 45%)',
           }}
         />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, position: 'relative' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            position: 'relative',
+          }}
+        >
           <div
             style={{
               width: 32,
@@ -60,10 +61,23 @@ export default function Login() {
           >
             T
           </div>
-          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 19 }}>TaskFlow</span>
+          <span
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontWeight: 700,
+              fontSize: 19,
+            }}
+          >
+            TaskFlow
+          </span>
         </div>
 
-        <div style={{ position: 'relative', maxWidth: 440 }}>
+        <div
+          style={{
+            position: 'relative',
+            maxWidth: 440,
+          }}
+        >
           <p
             className="mono"
             style={{
@@ -88,18 +102,45 @@ export default function Login() {
           >
             Every task, every deadline, on one board.
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 15, lineHeight: 1.6 }}>
-            Admins assign work and track delivery across the team. Employees see exactly
-            what's due, and what's about to run out of runway.
+          <p
+            style={{
+              color: 'var(--text-secondary)',
+              fontSize: 15,
+              lineHeight: 1.6,
+            }}
+          >
+            Admins assign work and track delivery across the team. Employees see exactly what's due, and
+            what's about to run out of runway.
           </p>
 
-          <div style={{ display: 'flex', gap: 10, marginTop: 32 }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: 10,
+              marginTop: 32,
+            }}
+          >
             {[
-              { label: 'To Do', color: 'var(--status-todo)' },
-              { label: 'In Progress', color: 'var(--status-progress)' },
-              { label: 'On Hold', color: 'var(--status-hold)' },
-              { label: 'Delivered', color: 'var(--status-delivered)' },
-              { label: 'Cancelled', color: 'var(--status-cancelled)' },
+              {
+                label: 'To Do',
+                color: 'var(--status-todo)',
+              },
+              {
+                label: 'In Progress',
+                color: 'var(--status-progress)',
+              },
+              {
+                label: 'On Hold',
+                color: 'var(--status-hold)',
+              },
+              {
+                label: 'Delivered',
+                color: 'var(--status-delivered)',
+              },
+              {
+                label: 'Cancelled',
+                color: 'var(--status-cancelled)',
+              },
             ].map((s) => (
               <span
                 key={s.label}
@@ -112,21 +153,49 @@ export default function Login() {
                   fontFamily: 'var(--font-mono)',
                 }}
               >
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: s.color }} />
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: s.color,
+                  }}
+                />
                 {s.label}
               </span>
             ))}
           </div>
         </div>
 
-        <div className="mono" style={{ fontSize: 11.5, color: 'var(--text-muted)', position: 'relative' }}>
+        <div
+          className="mono"
+          style={{
+            fontSize: 11.5,
+            color: 'var(--text-muted)',
+            position: 'relative',
+          }}
+        >
           Deadline Watch flags anything due in 3 days or less.
         </div>
       </div>
 
-      {/* Right panel - form */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, position: 'relative' }}>
-        <div style={{ position: 'absolute', top: 20, right: 20 }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 32,
+          position: 'relative',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: 20,
+            right: 20,
+          }}
+        >
           <ThemeToggle compact />
         </div>
         <div className="mobile-logo">
@@ -146,13 +215,40 @@ export default function Login() {
           >
             T
           </div>
-          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 19 }}>TaskFlow</span>
+          <span
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontWeight: 700,
+              fontSize: 19,
+            }}
+          >
+            TaskFlow
+          </span>
         </div>
-        <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: 360 }}>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, marginBottom: 6 }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            width: '100%',
+            maxWidth: 360,
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 22,
+              fontWeight: 700,
+              marginBottom: 6,
+            }}
+          >
             Sign in
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 28 }}>
+          <p
+            style={{
+              color: 'var(--text-secondary)',
+              fontSize: 14,
+              marginBottom: 28,
+            }}
+          >
             Use the account provided by your admin.
           </p>
 
@@ -172,8 +268,20 @@ export default function Login() {
             </div>
           )}
 
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>
+          <div
+            style={{
+              marginBottom: 16,
+            }}
+          >
+            <label
+              style={{
+                fontSize: 12.5,
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                display: 'block',
+                marginBottom: 6,
+              }}
+            >
               Email
             </label>
             <input
@@ -186,8 +294,20 @@ export default function Login() {
             />
           </div>
 
-          <div style={{ marginBottom: 24 }}>
-            <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>
+          <div
+            style={{
+              marginBottom: 24,
+            }}
+          >
+            <label
+              style={{
+                fontSize: 12.5,
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                display: 'block',
+                marginBottom: 6,
+              }}
+            >
               Password
             </label>
             <input
@@ -228,7 +348,6 @@ export default function Login() {
     </div>
   );
 }
-
 const inputStyle = {
   width: '100%',
   background: 'var(--bg-inset)',

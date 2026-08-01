@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import TaskDetailModal from '../components/TaskDetailModal';
 import api from '../api/axios';
-
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
 const STATUS_COLORS = {
   todo: 'var(--status-todo)',
   'in-progress': 'var(--status-progress)',
@@ -13,19 +11,15 @@ const STATUS_COLORS = {
   delivered: 'var(--status-delivered)',
   cancelled: 'var(--status-cancelled)',
 };
-
 function startOfMonth(date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
-
 function addMonths(date, n) {
   return new Date(date.getFullYear(), date.getMonth() + n, 1);
 }
-
 function sameDay(a, b) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
-
 function buildCalendarDays(monthDate) {
   const first = startOfMonth(monthDate);
   const gridStart = new Date(first);
@@ -38,7 +32,6 @@ function buildCalendarDays(monthDate) {
   }
   return days;
 }
-
 export default function CalendarView() {
   const navigate = useNavigate();
   const today = useMemo(() => new Date(), []);
@@ -47,8 +40,7 @@ export default function CalendarView() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [detailTaskId, setDetailTaskId] = useState(null);
-  const [dayModal, setDayModal] = useState(null); // { day, events } for "+more" overflow
-
+  const [dayModal, setDayModal] = useState(null);
   useEffect(() => {
     setLoading(true);
     Promise.all([api.get('/tasks'), api.get('/projects')])
@@ -58,7 +50,6 @@ export default function CalendarView() {
       })
       .finally(() => setLoading(false));
   }, []);
-
   const milestoneEvents = useMemo(() => {
     const events = [];
     projects.forEach((p) => {
@@ -76,7 +67,6 @@ export default function CalendarView() {
     });
     return events;
   }, [projects]);
-
   const taskEvents = useMemo(
     () =>
       tasks
@@ -90,18 +80,28 @@ export default function CalendarView() {
         })),
     [tasks]
   );
-
   const days = useMemo(() => buildCalendarDays(month), [month]);
-
   const eventsForDay = (day) => [
     ...taskEvents.filter((e) => sameDay(e.date, day)),
     ...milestoneEvents.filter((e) => sameDay(e.date, day)),
   ];
-
   return (
     <PageShell title="Calendar" subtitle="Task deadlines and project milestones, by day.">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', gap: 6 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          marginBottom: 18,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            gap: 6,
+          }}
+        >
           <button onClick={() => setMonth((m) => addMonths(m, -1))} style={navBtnStyle}>
             ←
           </button>
@@ -112,23 +112,73 @@ export default function CalendarView() {
             →
           </button>
         </div>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700 }}>
-          {month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
+        <span
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 16,
+            fontWeight: 700,
+          }}
+        >
+          {month.toLocaleDateString(undefined, {
+            month: 'long',
+            year: 'numeric',
+          })}
         </span>
-        <div style={{ display: 'flex', gap: 14, marginLeft: 'auto', fontSize: 11.5, color: 'var(--text-muted)' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ width: 7, height: 7, borderRadius: 2, background: 'var(--status-progress)' }} />
+        <div
+          style={{
+            display: 'flex',
+            gap: 14,
+            marginLeft: 'auto',
+            fontSize: 11.5,
+            color: 'var(--text-muted)',
+          }}
+        >
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+            }}
+          >
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: 2,
+                background: 'var(--status-progress)',
+              }}
+            />
             Task deadline
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent-cyan)' }} />
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+            }}
+          >
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                background: 'var(--accent-cyan)',
+              }}
+            />
             Milestone
           </span>
         </div>
       </div>
 
       {loading ? (
-        <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>Loading calendar…</div>
+        <div
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 14,
+          }}
+        >
+          Loading calendar…
+        </div>
       ) : (
         <div className="cal-grid">
           {WEEKDAYS.map((w) => (
@@ -142,9 +192,11 @@ export default function CalendarView() {
             const events = eventsForDay(day);
             const visible = events.slice(0, 3);
             const overflow = events.length - visible.length;
-
             return (
-              <div key={i} className={`cal-day${inMonth ? '' : ' cal-day-outside'}${isToday ? ' cal-day-today' : ''}`}>
+              <div
+                key={i}
+                className={`cal-day${inMonth ? '' : ' cal-day-outside'}${isToday ? ' cal-day-today' : ''}`}
+              >
                 <div className="cal-day-number">{day.getDate()}</div>
                 <div className="cal-day-events">
                   {visible.map((e, idx) =>
@@ -152,7 +204,9 @@ export default function CalendarView() {
                       <button
                         key={`t-${e.id}`}
                         className="cal-event cal-event-task"
-                        style={{ '--evt-color': STATUS_COLORS[e.status] }}
+                        style={{
+                          '--evt-color': STATUS_COLORS[e.status],
+                        }}
                         onClick={() => setDetailTaskId(e.id)}
                         title={e.title}
                       >
@@ -170,7 +224,15 @@ export default function CalendarView() {
                     )
                   )}
                   {overflow > 0 && (
-                    <button className="cal-more" onClick={() => setDayModal({ day, events })}>
+                    <button
+                      className="cal-more"
+                      onClick={() =>
+                        setDayModal({
+                          day,
+                          events,
+                        })
+                      }
+                    >
                       +{overflow} more
                     </button>
                   )}
@@ -294,16 +356,35 @@ export default function CalendarView() {
               maxWidth: 340,
             }}
           >
-            <div style={{ fontWeight: 700, marginBottom: 12 }}>
-              {dayModal.day.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+            <div
+              style={{
+                fontWeight: 700,
+                marginBottom: 12,
+              }}
+            >
+              {dayModal.day.toLocaleDateString(undefined, {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric',
+              })}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              }}
+            >
               {dayModal.events.map((e, idx) =>
                 e.type === 'task' ? (
                   <button
                     key={`t-${e.id}`}
                     className="cal-event cal-event-task"
-                    style={{ '--evt-color': STATUS_COLORS[e.status], padding: '8px 10px', fontSize: 12.5 }}
+                    style={{
+                      '--evt-color': STATUS_COLORS[e.status],
+                      padding: '8px 10px',
+                      fontSize: 12.5,
+                    }}
                     onClick={() => {
                       setDayModal(null);
                       setDetailTaskId(e.id);
@@ -315,7 +396,10 @@ export default function CalendarView() {
                   <button
                     key={`m-${idx}`}
                     className="cal-event cal-event-milestone"
-                    style={{ padding: '8px 10px', fontSize: 12.5 }}
+                    style={{
+                      padding: '8px 10px',
+                      fontSize: 12.5,
+                    }}
                     onClick={() => {
                       setDayModal(null);
                       navigate(`/projects/${e.projectId}`);
@@ -334,7 +418,6 @@ export default function CalendarView() {
     </PageShell>
   );
 }
-
 const navBtnStyle = {
   background: 'var(--bg-inset)',
   border: '1px solid var(--border-hairline)',

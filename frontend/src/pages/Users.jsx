@@ -4,13 +4,11 @@ import UserFormModal from '../components/UserFormModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
-
 const ROLE_COLORS = {
   admin: 'var(--accent-cyan)',
   manager: 'var(--status-hold)',
   employee: 'var(--text-secondary)',
 };
-
 export default function Users() {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
@@ -20,24 +18,22 @@ export default function Users() {
   const [search, setSearch] = useState('');
   const [deletingId, setDeletingId] = useState(null);
   const debouncedSearch = useDebounce(search, 400);
-
   const load = async () => {
     setLoading(true);
     try {
       const params = {};
       if (debouncedSearch) params.search = debouncedSearch;
-      const res = await api.get('/users', { params });
+      const res = await api.get('/users', {
+        params,
+      });
       setUsers(res.data);
     } finally {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
-
   const managers = useMemo(() => users.filter((u) => u.role === 'manager'), [users]);
   const managerNameById = useMemo(() => {
     const map = {};
@@ -46,7 +42,6 @@ export default function Users() {
     });
     return map;
   }, [managers]);
-
   const handleSubmit = async (form, userId) => {
     if (userId) {
       await api.put(`/users/${userId}`, form);
@@ -54,15 +49,11 @@ export default function Users() {
       await api.post('/users', form);
     }
   };
-
-  // Mirrors the backend rule in utils/userPermissions.js: only the main admin
-  // can delete another admin, and the main admin account can never be deleted.
   const canDeleteUser = (target) => {
     if (target.isMainAdmin) return false;
     if (target.role !== 'admin') return true;
     return Boolean(currentUser.isMainAdmin);
   };
-
   const handleDelete = async (u) => {
     if (!window.confirm(`Delete ${u.name}? This cannot be undone.`)) return;
     setDeletingId(u._id);
@@ -70,12 +61,12 @@ export default function Users() {
       await api.delete(`/users/${u._id}`);
       setUsers((list) => list.filter((x) => x._id !== u._id));
     } catch (err) {
-      // A request can fail (timeout, dropped connection) even after the
-      // server already deleted the user. Re-sync with the server instead of
-      // trusting the failed response, so the list doesn't show a stale row
-      // or a false "failed" alert for something that actually succeeded.
       const stillExists = await api
-        .get('/users', { params: { search: u.email } })
+        .get('/users', {
+          params: {
+            search: u.email,
+          },
+        })
         .then((res) => res.data.some((x) => x._id === u._id))
         .catch(() => true);
       if (stillExists) {
@@ -87,7 +78,6 @@ export default function Users() {
       setDeletingId(null);
     }
   };
-
   return (
     <PageShell
       title="Team & Access"
@@ -113,7 +103,11 @@ export default function Users() {
         </button>
       }
     >
-      <div style={{ marginBottom: 16 }}>
+      <div
+        style={{
+          marginBottom: 16,
+        }}
+      >
         <input
           type="text"
           value={search}
@@ -140,127 +134,169 @@ export default function Users() {
           padding: '10px',
         }}
       >
-        <div style={{ overflowX: 'auto', maxHeight: "470px", overflowY: 'auto', paddingRight: "6px" }}>
-        <table style={{ width: '100%', minWidth: 720, borderCollapse: 'collapse' }}>
-          <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: 'var(--bg-panel)', paddingTop: "6px" }}>
-            <tr>
-              {['Name', 'Email', 'Role', 'Reports to', 'Department', 'Status', ''].map((h) => (
-                <th
-                  key={h}
-                  style={{
-                    textAlign: 'left',
-                    padding: '10px 16px',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: 'var(--text-muted)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    borderBottom: '1px solid var(--border-hairline-soft)',
-                  }}
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {!loading && users.length === 0 && (
+        <div
+          style={{
+            overflowX: 'auto',
+            maxHeight: '470px',
+            overflowY: 'auto',
+            paddingRight: '6px',
+          }}
+        >
+          <table
+            style={{
+              width: '100%',
+              minWidth: 720,
+              borderCollapse: 'collapse',
+            }}
+          >
+            <thead
+              style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 1,
+                background: 'var(--bg-panel)',
+                paddingTop: '6px',
+              }}
+            >
               <tr>
-                <td colSpan={7} style={{ padding: '40px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                  {search ? 'No users match your search.' : 'No users yet.'}
-                </td>
-              </tr>
-            )}
-            {users.map((u) => (
-              <tr key={u._id}>
-                <td style={tdStyle}>{u.name}</td>
-                <td style={{ ...tdStyle }} className="mono">
-                  {u.email}
-                </td>
-                <td style={tdStyle}>
-                  <span
+                {['Name', 'Email', 'Role', 'Reports to', 'Department', 'Status', ''].map((h) => (
+                  <th
+                    key={h}
                     style={{
-                      fontSize: 11.5,
-                      fontWeight: 700,
+                      textAlign: 'left',
+                      padding: '10px 16px',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: 'var(--text-muted)',
                       textTransform: 'uppercase',
-                      letterSpacing: '0.04em',
-                      color: ROLE_COLORS[u.role] || 'var(--text-secondary)',
+                      letterSpacing: '0.05em',
+                      borderBottom: '1px solid var(--border-hairline-soft)',
                     }}
                   >
-                    {u.role}
-                  </span>
-                  {u.isMainAdmin && (
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {!loading && users.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={7}
+                    style={{
+                      padding: '40px 16px',
+                      textAlign: 'center',
+                      color: 'var(--text-muted)',
+                    }}
+                  >
+                    {search ? 'No users match your search.' : 'No users yet.'}
+                  </td>
+                </tr>
+              )}
+              {users.map((u) => (
+                <tr key={u._id}>
+                  <td style={tdStyle}>{u.name}</td>
+                  <td
+                    style={{
+                      ...tdStyle,
+                    }}
+                    className="mono"
+                  >
+                    {u.email}
+                  </td>
+                  <td style={tdStyle}>
                     <span
                       style={{
-                        marginLeft: 6,
-                        fontSize: 10,
+                        fontSize: 11.5,
                         fontWeight: 700,
-                        padding: '2px 6px',
-                        borderRadius: 4,
-                        background: 'var(--accent-cyan)',
-                        color: 'var(--text-on-accent)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em',
+                        color: ROLE_COLORS[u.role] || 'var(--text-secondary)',
                       }}
                     >
-                      MAIN
+                      {u.role}
                     </span>
-                  )}
-                </td>
-                <td style={tdStyle}>{u.role === 'employee' ? managerNameById[u.manager] || '—' : '—'}</td>
-                <td style={tdStyle}>{u.department || '—'}</td>
-                <td style={tdStyle}>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: u.isActive ? 'var(--status-delivered)' : 'var(--status-cancelled)',
-                    }}
-                  >
-                    {u.isActive ? 'Active' : 'Deactivated'}
-                  </span>
-                </td>
-                <td style={tdStyle}>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button
-                      onClick={() => {
-                        setEditingUser(u);
-                        setShowForm(true);
-                      }}
-                      style={iconBtnStyle}
-                    >
-                      Edit
-                    </button>
-                    {canDeleteUser(u) ? (
-                      <button
-                        onClick={() => handleDelete(u)}
-                        disabled={deletingId === u._id}
+                    {u.isMainAdmin && (
+                      <span
                         style={{
-                          ...iconBtnStyle,
-                          color: 'var(--status-cancelled)',
-                          opacity: deletingId === u._id ? 0.6 : 1,
-                          cursor: deletingId === u._id ? 'default' : 'pointer',
+                          marginLeft: 6,
+                          fontSize: 10,
+                          fontWeight: 700,
+                          padding: '2px 6px',
+                          borderRadius: 4,
+                          background: 'var(--accent-cyan)',
+                          color: 'var(--text-on-accent)',
                         }}
                       >
-                        {deletingId === u._id ? 'Deleting…' : 'Delete'}
-                      </button>
-                    ) : (
-                      <button
-                        disabled
-                        title={
-                          u.isMainAdmin
-                            ? 'The main admin account cannot be deleted'
-                            : 'Only the main admin can delete another admin account'
-                        }
-                        style={{ ...iconBtnStyle, opacity: 0.4, cursor: 'not-allowed' }}
-                      >
-                        Delete
-                      </button>
+                        MAIN
+                      </span>
                     )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </td>
+                  <td style={tdStyle}>{u.role === 'employee' ? managerNameById[u.manager] || '—' : '—'}</td>
+                  <td style={tdStyle}>{u.department || '—'}</td>
+                  <td style={tdStyle}>
+                    <span
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: u.isActive ? 'var(--status-delivered)' : 'var(--status-cancelled)',
+                      }}
+                    >
+                      {u.isActive ? 'Active' : 'Deactivated'}
+                    </span>
+                  </td>
+                  <td style={tdStyle}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 8,
+                      }}
+                    >
+                      <button
+                        onClick={() => {
+                          setEditingUser(u);
+                          setShowForm(true);
+                        }}
+                        style={iconBtnStyle}
+                      >
+                        Edit
+                      </button>
+                      {canDeleteUser(u) ? (
+                        <button
+                          onClick={() => handleDelete(u)}
+                          disabled={deletingId === u._id}
+                          style={{
+                            ...iconBtnStyle,
+                            color: 'var(--status-cancelled)',
+                            opacity: deletingId === u._id ? 0.6 : 1,
+                            cursor: deletingId === u._id ? 'default' : 'pointer',
+                          }}
+                        >
+                          {deletingId === u._id ? 'Deleting…' : 'Delete'}
+                        </button>
+                      ) : (
+                        <button
+                          disabled
+                          title={
+                            u.isMainAdmin
+                              ? 'The main admin account cannot be deleted'
+                              : 'Only the main admin can delete another admin account'
+                          }
+                          style={{
+                            ...iconBtnStyle,
+                            opacity: 0.4,
+                            cursor: 'not-allowed',
+                          }}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -280,14 +316,12 @@ export default function Users() {
     </PageShell>
   );
 }
-
 const tdStyle = {
   padding: '14px 16px',
   fontSize: 13.5,
   color: 'var(--text-primary)',
   borderBottom: '1px solid var(--border-hairline-soft)',
 };
-
 const iconBtnStyle = {
   background: 'transparent',
   border: '1px solid var(--border-hairline)',

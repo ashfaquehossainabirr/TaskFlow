@@ -3,19 +3,21 @@ import Modal from './Modal';
 import TaskTable from './TaskTable';
 import TaskDetailModal from './TaskDetailModal';
 import api from '../api/axios';
-
 export default function EmployeeTasksModal({ employee, onClose }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [detailTaskId, setDetailTaskId] = useState(null);
-
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError('');
     api
-      .get('/tasks', { params: { assignedTo: employee._id } })
+      .get('/tasks', {
+        params: {
+          assignedTo: employee._id,
+        },
+      })
       .then((res) => {
         if (!cancelled) setTasks(res.data);
       })
@@ -29,11 +31,24 @@ export default function EmployeeTasksModal({ employee, onClose }) {
       cancelled = true;
     };
   }, [employee._id]);
-
   return (
     <Modal title={`${employee.name}'s tasks`} onClose={onClose} width={780}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
-        <span className="mono" style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          marginBottom: 18,
+          flexWrap: 'wrap',
+        }}
+      >
+        <span
+          className="mono"
+          style={{
+            fontSize: 12.5,
+            color: 'var(--text-muted)',
+          }}
+        >
           {employee.email}
         </span>
         {employee.department && (
@@ -52,7 +67,16 @@ export default function EmployeeTasksModal({ employee, onClose }) {
         )}
       </div>
 
-      {loading && <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>Loading tasks…</div>}
+      {loading && (
+        <div
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 14,
+          }}
+        >
+          Loading tasks…
+        </div>
+      )}
 
       {error && (
         <div

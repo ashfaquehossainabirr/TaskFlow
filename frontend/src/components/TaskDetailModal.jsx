@@ -7,28 +7,40 @@ import { useAuth } from '../context/AuthContext';
 import { useTimer } from '../context/TimerContext';
 import { daysRemaining } from '../utils/deadline';
 import { formatStopwatch, formatDurationShort } from '../utils/time';
-
-const row = { display: 'flex', justifyContent: 'space-between', gap: 16, padding: '11px 0', borderBottom: '1px solid var(--border-hairline-soft)' };
-const rowLabel = { fontSize: 12.5, color: 'var(--text-muted)', fontWeight: 600, flexShrink: 0 };
-const rowValue = { fontSize: 13.5, color: 'var(--text-primary)', textAlign: 'right', wordBreak: 'break-word', minWidth: 0 };
-
+const row = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  gap: 16,
+  padding: '11px 0',
+  borderBottom: '1px solid var(--border-hairline-soft)',
+};
+const rowLabel = {
+  fontSize: 12.5,
+  color: 'var(--text-muted)',
+  fontWeight: 600,
+  flexShrink: 0,
+};
+const rowValue = {
+  fontSize: 13.5,
+  color: 'var(--text-primary)',
+  textAlign: 'right',
+  wordBreak: 'break-word',
+  minWidth: 0,
+};
 export default function TaskDetailModal({ taskId, onClose }) {
   const { user } = useAuth();
   const { activeEntry, elapsedSeconds, startTimer, stopTimer } = useTimer();
   const [task, setTask] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-
   const [activity, setActivity] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
   const [posting, setPosting] = useState(false);
   const [commentError, setCommentError] = useState('');
-
   const [timeEntries, setTimeEntries] = useState([]);
   const [timeError, setTimeError] = useState('');
   const [timerBusy, setTimerBusy] = useState(false);
-
   const loadActivity = () => {
     setActivityLoading(true);
     return api
@@ -37,14 +49,16 @@ export default function TaskDetailModal({ taskId, onClose }) {
       .catch(() => {})
       .finally(() => setActivityLoading(false));
   };
-
   const loadTimeEntries = () => {
     return api
-      .get('/time-entries', { params: { task: taskId } })
+      .get('/time-entries', {
+        params: {
+          task: taskId,
+        },
+      })
       .then((res) => setTimeEntries(res.data))
       .catch(() => {});
   };
-
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -65,14 +79,11 @@ export default function TaskDetailModal({ taskId, onClose }) {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskId]);
-
   const isThisTaskActive = Boolean(activeEntry && String(activeEntry.task?._id) === String(taskId));
   const isOtherTaskActive = Boolean(activeEntry && !isThisTaskActive);
   const loggedSeconds = timeEntries.reduce((sum, e) => sum + (e.durationSeconds || 0), 0);
   const totalSeconds = loggedSeconds + (isThisTaskActive ? elapsedSeconds : 0);
-
   const handleStartTimer = async () => {
     setTimeError('');
     setTimerBusy(true);
@@ -84,7 +95,6 @@ export default function TaskDetailModal({ taskId, onClose }) {
       setTimerBusy(false);
     }
   };
-
   const handleStopTimer = async () => {
     setTimerBusy(true);
     try {
@@ -96,7 +106,6 @@ export default function TaskDetailModal({ taskId, onClose }) {
       setTimerBusy(false);
     }
   };
-
   const handleDeleteTimeEntry = async (entryId) => {
     if (!window.confirm('Delete this time entry?')) return;
     const prev = timeEntries;
@@ -108,14 +117,15 @@ export default function TaskDetailModal({ taskId, onClose }) {
       alert(err.response?.data?.message || 'Failed to delete time entry.');
     }
   };
-
   const handlePostComment = async (e) => {
     e.preventDefault();
     if (!commentText.trim()) return;
     setCommentError('');
     setPosting(true);
     try {
-      const res = await api.post(`/tasks/${taskId}/comments`, { text: commentText.trim() });
+      const res = await api.post(`/tasks/${taskId}/comments`, {
+        text: commentText.trim(),
+      });
       setActivity((prev) => [...prev, res.data]);
       setCommentText('');
     } catch (err) {
@@ -124,7 +134,6 @@ export default function TaskDetailModal({ taskId, onClose }) {
       setPosting(false);
     }
   };
-
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm('Delete this comment?')) return;
     const prev = activity;
@@ -136,10 +145,19 @@ export default function TaskDetailModal({ taskId, onClose }) {
       alert(err.response?.data?.message || 'Failed to delete comment.');
     }
   };
-
   return (
     <Modal title={loading ? 'Loading task…' : task?.title || 'Task details'} onClose={onClose} width={560}>
-      {loading && <div style={{ padding: '20px 0', color: 'var(--text-muted)', fontSize: 14 }}>Loading…</div>}
+      {loading && (
+        <div
+          style={{
+            padding: '20px 0',
+            color: 'var(--text-muted)',
+            fontSize: 14,
+          }}
+        >
+          Loading…
+        </div>
+      )}
 
       {error && (
         <div
@@ -158,29 +176,64 @@ export default function TaskDetailModal({ taskId, onClose }) {
 
       {!loading && task && (
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              marginBottom: 18,
+              flexWrap: 'wrap',
+            }}
+          >
             <StatusBadge status={task.status} />
             <DeadlineChip deadline={task.deadline} status={task.status} />
             <PriorityPill priority={task.priority} />
           </div>
 
           {task.description && (
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ ...rowLabel, marginBottom: 6 }}>Description</div>
-              <p style={{ fontSize: 13.5, color: 'var(--text-primary)', lineHeight: 1.6, margin: 0 }}>
+            <div
+              style={{
+                marginBottom: 20,
+              }}
+            >
+              <div
+                style={{
+                  ...rowLabel,
+                  marginBottom: 6,
+                }}
+              >
+                Description
+              </div>
+              <p
+                style={{
+                  fontSize: 13.5,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.6,
+                  margin: 0,
+                }}
+              >
                 {task.description}
               </p>
             </div>
           )}
 
-          <div style={{ marginBottom: 22 }}>
+          <div
+            style={{
+              marginBottom: 22,
+            }}
+          >
             <div style={row}>
               <span style={rowLabel}>Project</span>
-              <span style={{ ...rowValue }} className="mono">
+              <span
+                style={{
+                  ...rowValue,
+                }}
+                className="mono"
+              >
                 {task.project?.name || '—'}
               </span>
             </div>
-            {(task.projectValue !== null && task.projectValue !== undefined) && (
+            {task.projectValue !== null && task.projectValue !== undefined && (
               <div style={row}>
                 <span style={rowLabel}>Project value</span>
                 <span style={rowValue} className="mono">
@@ -230,16 +283,48 @@ export default function TaskDetailModal({ taskId, onClose }) {
               <span style={rowLabel}>Created</span>
               <span style={rowValue}>{new Date(task.createdAt).toLocaleDateString()}</span>
             </div>
-            <div style={{ ...row, borderBottom: 'none' }}>
+            <div
+              style={{
+                ...row,
+                borderBottom: 'none',
+              }}
+            >
               <span style={rowLabel}>Last updated</span>
               <span style={rowValue}>{new Date(task.updatedAt).toLocaleString()}</span>
             </div>
           </div>
 
-          <div style={{ marginBottom: 22 }}>
-            <div style={{ ...rowLabel, marginBottom: 10 }}>Time tracking</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, flexWrap: 'wrap', gap: 10 }}>
-              <span className="mono" style={{ fontSize: 22, fontWeight: 700, color: isThisTaskActive ? 'var(--accent-cyan)' : 'var(--text-primary)' }}>
+          <div
+            style={{
+              marginBottom: 22,
+            }}
+          >
+            <div
+              style={{
+                ...rowLabel,
+                marginBottom: 10,
+              }}
+            >
+              Time tracking
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 10,
+                flexWrap: 'wrap',
+                gap: 10,
+              }}
+            >
+              <span
+                className="mono"
+                style={{
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: isThisTaskActive ? 'var(--accent-cyan)' : 'var(--text-primary)',
+                }}
+              >
                 {formatStopwatch(totalSeconds)}
               </span>
               {isThisTaskActive ? (
@@ -298,7 +383,13 @@ export default function TaskDetailModal({ taskId, onClose }) {
             )}
 
             {timeEntries.filter((e) => e.endTime).length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 6,
+                }}
+              >
                 {timeEntries
                   .filter((e) => e.endTime)
                   .map((e) => (
@@ -313,10 +404,23 @@ export default function TaskDetailModal({ taskId, onClose }) {
                         gap: 8,
                       }}
                     >
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span
+                        style={{
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
                         {e.user?.name || 'Someone'} · {new Date(e.startTime).toLocaleDateString()}
                       </span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      <span
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          flexShrink: 0,
+                        }}
+                      >
                         <span className="mono">{formatDurationShort(e.durationSeconds)}</span>
                         {(user.role === 'admin' || String(e.user?._id) === String(user._id)) && (
                           <button
@@ -341,16 +445,46 @@ export default function TaskDetailModal({ taskId, onClose }) {
           </div>
 
           <div>
-            <div style={{ ...rowLabel, marginBottom: 10 }}>Activity &amp; comments</div>
+            <div
+              style={{
+                ...rowLabel,
+                marginBottom: 10,
+              }}
+            >
+              Activity &amp; comments
+            </div>
 
-            {activityLoading && <div style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>Loading activity…</div>}
+            {activityLoading && (
+              <div
+                style={{
+                  fontSize: 12.5,
+                  color: 'var(--text-muted)',
+                }}
+              >
+                Loading activity…
+              </div>
+            )}
 
             {!activityLoading && activity.length === 0 && (
-              <div style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>No activity yet.</div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  color: 'var(--text-muted)',
+                }}
+              >
+                No activity yet.
+              </div>
             )}
 
             {!activityLoading && activity.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10,
+                  marginBottom: 16,
+                }}
+              >
                 {activity.map((a) =>
                   a.type === 'comment' ? (
                     <div
@@ -362,12 +496,37 @@ export default function TaskDetailModal({ taskId, onClose }) {
                         padding: '10px 12px',
                       }}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                        <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-primary)' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: 4,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 12.5,
+                            fontWeight: 700,
+                            color: 'var(--text-primary)',
+                          }}
+                        >
                           {a.user?.name || 'Unknown'}
                         </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span className="mono" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                          }}
+                        >
+                          <span
+                            className="mono"
+                            style={{
+                              fontSize: 11,
+                              color: 'var(--text-muted)',
+                            }}
+                          >
                             {new Date(a.createdAt).toLocaleString()}
                           </span>
                           {(user.role === 'admin' || String(a.user?._id) === String(user._id)) && (
@@ -387,10 +546,25 @@ export default function TaskDetailModal({ taskId, onClose }) {
                           )}
                         </div>
                       </div>
-                      <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>{a.text}</div>
+                      <div
+                        style={{
+                          fontSize: 13,
+                          color: 'var(--text-primary)',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {a.text}
+                      </div>
                     </div>
                   ) : (
-                    <div key={a._id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div
+                      key={a._id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                      }}
+                    >
                       <div
                         style={{
                           width: 6,
@@ -400,10 +574,30 @@ export default function TaskDetailModal({ taskId, onClose }) {
                           flexShrink: 0,
                         }}
                       />
-                      <span style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>
-                        <strong style={{ color: 'var(--text-primary)' }}>{a.user?.name || 'Someone'}</strong> {a.message}
+                      <span
+                        style={{
+                          fontSize: 12.5,
+                          color: 'var(--text-secondary)',
+                        }}
+                      >
+                        <strong
+                          style={{
+                            color: 'var(--text-primary)',
+                          }}
+                        >
+                          {a.user?.name || 'Someone'}
+                        </strong>{' '}
+                        {a.message}
                       </span>
-                      <span className="mono" style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 'auto', flexShrink: 0 }}>
+                      <span
+                        className="mono"
+                        style={{
+                          fontSize: 11,
+                          color: 'var(--text-muted)',
+                          marginLeft: 'auto',
+                          flexShrink: 0,
+                        }}
+                      >
                         {new Date(a.createdAt).toLocaleString()}
                       </span>
                     </div>
@@ -445,7 +639,13 @@ export default function TaskDetailModal({ taskId, onClose }) {
                   fontFamily: 'inherit',
                 }}
               />
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginTop: 8,
+                }}
+              >
                 <button
                   type="submit"
                   disabled={posting || !commentText.trim()}
@@ -471,14 +671,12 @@ export default function TaskDetailModal({ taskId, onClose }) {
     </Modal>
   );
 }
-
 function formatDaysAbsolute(deadline) {
   const days = daysRemaining(deadline);
   if (days < 0) return `${Math.abs(days)} day${Math.abs(days) === 1 ? '' : 's'} overdue`;
   if (days === 0) return 'Due today';
   return `${days} day${days === 1 ? '' : 's'} remaining`;
 }
-
 function PriorityPill({ priority }) {
   const colors = {
     low: 'var(--text-muted)',
