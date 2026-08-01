@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import StatsCards from '../components/StatsCards';
 import TaskCompletionDonut from '../components/TaskCompletionDonut';
+import PendingTasksList from '../components/PendingTasksList';
 import TaskTable from '../components/TaskTable';
 import TaskDetailModal from '../components/TaskDetailModal';
 import NoticeBoard from '../components/NoticeBoard';
@@ -52,13 +53,30 @@ export default function Overview() {
         }
       />
 
-      <div
-        style={{
-          marginBottom: 28,
-        }}
-      >
+      <div className="overview-top-grid">
         <TaskCompletionDonut stats={stats} loading={loading} />
+        <PendingTasksList onTaskClick={(task) => setDetailTaskId(task._id)} />
       </div>
+
+      <style>{`
+        .overview-top-grid {
+          display: grid;
+          grid-template-columns: minmax(300px, 380px) 1fr;
+          gap: 20px;
+          align-items: stretch;
+          margin-bottom: 28px;
+        }
+        @media (max-width: 1024px) {
+          .overview-top-grid {
+            grid-template-columns: minmax(280px, 340px) 1fr;
+          }
+        }
+        @media (max-width: 780px) {
+          .overview-top-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
 
       <div
         style={{
