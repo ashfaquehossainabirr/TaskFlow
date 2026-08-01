@@ -312,7 +312,11 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
               >
                 <button
                   type="button"
-                  style={secondaryBtn}
+                  style={{
+                    ...secondaryBtn,
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--text-primary)',
+                  }}
                   onClick={() => setConfirmDelete(false)}
                   disabled={deleting}
                 >
