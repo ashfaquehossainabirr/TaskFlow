@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import PageShell from '../components/PageShell';
 import UserFormModal from '../components/UserFormModal';
+import ConfirmModal from '../components/ConfirmModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
@@ -17,6 +18,7 @@ export default function Users() {
   const [editingUser, setEditingUser] = useState(null);
   const [search, setSearch] = useState('');
   const [deletingId, setDeletingId] = useState(null);
+  const [confirmDeleteUser, setConfirmDeleteUser] = useState(null);
   const debouncedSearch = useDebounce(search, 400);
   const load = async () => {
     setLoading(true);
@@ -54,8 +56,9 @@ export default function Users() {
     if (target.role !== 'admin') return true;
     return Boolean(currentUser.isMainAdmin);
   };
-  const handleDelete = async (u) => {
-    if (!window.confirm(`Delete ${u.name}? This cannot be undone.`)) return;
+  const handleDelete = (u) => setConfirmDeleteUser(u);
+  const performDelete = async () => {
+    const u = confirmDeleteUser;
     setDeletingId(u._id);
     try {
       await api.delete(`/users/${u._id}`);
@@ -76,6 +79,7 @@ export default function Users() {
       }
     } finally {
       setDeletingId(null);
+      setConfirmDeleteUser(null);
     }
   };
   return (
@@ -311,6 +315,16 @@ export default function Users() {
             load();
           }}
           onSubmit={handleSubmit}
+        />
+      )}
+
+      {confirmDeleteUser && (
+        <ConfirmModal
+          title="Delete user"
+          message={`Delete ${confirmDeleteUser.name}? This cannot be undone.`}
+          confirmLabel="Delete user"
+          onConfirm={performDelete}
+          onClose={() => setConfirmDeleteUser(null)}
         />
       )}
     </PageShell>

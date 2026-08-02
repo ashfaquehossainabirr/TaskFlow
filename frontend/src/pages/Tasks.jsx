@@ -3,6 +3,7 @@ import PageShell from '../components/PageShell';
 import TaskTable from '../components/TaskTable';
 import TaskFormModal from '../components/TaskFormModal';
 import TaskDetailModal from '../components/TaskDetailModal';
+import ConfirmModal from '../components/ConfirmModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { STATUS_LABELS } from '../utils/deadline';
@@ -23,6 +24,7 @@ export default function Tasks() {
   const [editingTask, setEditingTask] = useState(null);
   const [detailTaskId, setDetailTaskId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [confirmDeleteTask, setConfirmDeleteTask] = useState(null);
   const loadTasks = async () => {
     setLoading(true);
     try {
@@ -86,8 +88,9 @@ export default function Tasks() {
       await api.post('/tasks', form);
     }
   };
-  const handleDelete = async (task) => {
-    if (!window.confirm(`Delete "${task.title}"? This cannot be undone.`)) return;
+  const handleDelete = (task) => setConfirmDeleteTask(task);
+  const performDelete = async () => {
+    const task = confirmDeleteTask;
     setDeletingId(task._id);
     try {
       await api.delete(`/tasks/${task._id}`);
@@ -104,6 +107,7 @@ export default function Tasks() {
       }
     } finally {
       setDeletingId(null);
+      setConfirmDeleteTask(null);
     }
   };
   return (
@@ -231,6 +235,16 @@ export default function Tasks() {
       )}
 
       {detailTaskId && <TaskDetailModal taskId={detailTaskId} onClose={() => setDetailTaskId(null)} />}
+
+      {confirmDeleteTask && (
+        <ConfirmModal
+          title="Delete task"
+          message={`Delete "${confirmDeleteTask.title}"? This cannot be undone.`}
+          confirmLabel="Delete task"
+          onConfirm={performDelete}
+          onClose={() => setConfirmDeleteTask(null)}
+        />
+      )}
     </PageShell>
   );
 }

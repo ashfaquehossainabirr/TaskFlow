@@ -251,6 +251,7 @@ export default function Sidebar({ isOpen, onClose }) {
           flex-shrink: 0;
           background: var(--bg-panel);
           border-right: 1px solid var(--border-hairline-soft);
+          box-shadow: 3px 0 18px rgba(0, 0, 0, 0.1);
           display: flex;
           flex-direction: column;
           padding: 20px 14px;
@@ -301,12 +302,13 @@ export default function Sidebar({ isOpen, onClose }) {
             top: 0;
             left: 0;
             transform: translateX(-100%);
-            transition: transform 0.25s ease;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
             z-index: 210;
-            box-shadow: 20px 0 45px rgba(0, 0, 0, 0.45);
+            box-shadow: none;
           }
           .sidebar-open {
             transform: translateX(0);
+            box-shadow: 6px 0 28px rgba(0, 0, 0, 0.28);
           }
           .sidebar-close-btn {
             display: inline-flex;
