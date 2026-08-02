@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import NoticeFormModal from './NoticeFormModal';
+import ConfirmModal from './ConfirmModal';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { canManageTasks } from '../utils/roles';
@@ -30,6 +31,7 @@ export default function NoticeBoard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [confirmDeleteNotice, setConfirmDeleteNotice] = useState(null);
   const load = async () => {
     setLoading(true);
     setError('');
@@ -48,8 +50,9 @@ export default function NoticeBoard() {
   const handleSubmit = async (form) => {
     await api.post('/notices', form);
   };
-  const handleDelete = async (notice) => {
-    if (!window.confirm(`Delete the notice "${notice.title}"?`)) return;
+  const handleDelete = (notice) => setConfirmDeleteNotice(notice);
+  const performDelete = async () => {
+    const notice = confirmDeleteNotice;
     const prev = notices;
     setNotices((list) => list.filter((n) => n._id !== notice._id));
     try {
@@ -57,6 +60,8 @@ export default function NoticeBoard() {
     } catch (err) {
       setNotices(prev);
       alert(err.response?.data?.message || 'Failed to delete notice.');
+    } finally {
+      setConfirmDeleteNotice(null);
     }
   };
   const canDelete = (notice) => user.role === 'admin' || String(notice.createdBy?._id) === String(user._id);
@@ -253,6 +258,16 @@ export default function NoticeBoard() {
             load();
           }}
           onSubmit={handleSubmit}
+        />
+      )}
+
+      {confirmDeleteNotice && (
+        <ConfirmModal
+          title="Delete notice"
+          message={`Delete the notice "${confirmDeleteNotice.title}"?`}
+          confirmLabel="Delete notice"
+          onConfirm={performDelete}
+          onClose={() => setConfirmDeleteNotice(null)}
         />
       )}
 

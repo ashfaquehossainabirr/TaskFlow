@@ -4,6 +4,7 @@ import PageShell from '../components/PageShell';
 import TaskTable from '../components/TaskTable';
 import TaskDetailModal from '../components/TaskDetailModal';
 import MilestoneFormModal from '../components/MilestoneFormModal';
+import ConfirmModal from '../components/ConfirmModal';
 import { ProjectStatusBadge, MilestoneStatusBadge } from '../components/ProjectStatusBadge';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
@@ -19,6 +20,8 @@ export default function ProjectDetail() {
   const [detailTaskId, setDetailTaskId] = useState(null);
   const [showMilestoneForm, setShowMilestoneForm] = useState(false);
   const [editingMilestone, setEditingMilestone] = useState(null);
+  const [confirmDeleteMilestone, setConfirmDeleteMilestone] = useState(null);
+  const [confirmDeleteProject, setConfirmDeleteProject] = useState(false);
   const load = async () => {
     setLoading(true);
     setError('');
@@ -70,23 +73,27 @@ export default function ProjectDetail() {
       await api.post(`/projects/${id}/milestones`, form);
     }
   };
-  const handleMilestoneDelete = async (milestone) => {
-    if (!window.confirm(`Delete milestone "${milestone.title}"? Tasks linked to it will be unlinked.`))
-      return;
+  const handleMilestoneDelete = (milestone) => setConfirmDeleteMilestone(milestone);
+  const performMilestoneDelete = async () => {
+    const milestone = confirmDeleteMilestone;
     try {
       const res = await api.delete(`/projects/${id}/milestones/${milestone._id}`);
       setProject(res.data);
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to delete milestone');
+    } finally {
+      setConfirmDeleteMilestone(null);
     }
   };
-  const handleDeleteProject = async () => {
-    if (!window.confirm(`Delete "${project.name}"? This cannot be undone.`)) return;
+  const handleDeleteProject = () => setConfirmDeleteProject(true);
+  const performDeleteProject = async () => {
     try {
       await api.delete(`/projects/${id}`);
       navigate('/projects');
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to delete project');
+    } finally {
+      setConfirmDeleteProject(false);
     }
   };
   if (loading) {
@@ -375,6 +382,26 @@ export default function ProjectDetail() {
       )}
 
       {detailTaskId && <TaskDetailModal taskId={detailTaskId} onClose={() => setDetailTaskId(null)} />}
+
+      {confirmDeleteMilestone && (
+        <ConfirmModal
+          title="Delete milestone"
+          message={`Delete milestone "${confirmDeleteMilestone.title}"? Tasks linked to it will be unlinked.`}
+          confirmLabel="Delete milestone"
+          onConfirm={performMilestoneDelete}
+          onClose={() => setConfirmDeleteMilestone(null)}
+        />
+      )}
+
+      {confirmDeleteProject && (
+        <ConfirmModal
+          title="Delete project"
+          message={`Delete "${project.name}"? This cannot be undone.`}
+          confirmLabel="Delete project"
+          onConfirm={performDeleteProject}
+          onClose={() => setConfirmDeleteProject(false)}
+        />
+      )}
     </PageShell>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Modal from './Modal';
+import ConfirmModal from './ConfirmModal';
 import StatusBadge from './StatusBadge';
 import DeadlineChip from './DeadlineChip';
 import api from '../api/axios';
@@ -38,6 +39,8 @@ export default function TaskDetailModal({ taskId, onClose }) {
   const [activityLoading, setActivityLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
   const [posting, setPosting] = useState(false);
+  const [confirmDeleteTimeEntry, setConfirmDeleteTimeEntry] = useState(null);
+  const [confirmDeleteComment, setConfirmDeleteComment] = useState(null);
   const [commentError, setCommentError] = useState('');
   const [timeEntries, setTimeEntries] = useState([]);
   const [timeError, setTimeError] = useState('');
@@ -107,8 +110,9 @@ export default function TaskDetailModal({ taskId, onClose }) {
       setTimerBusy(false);
     }
   };
-  const handleDeleteTimeEntry = async (entryId) => {
-    if (!window.confirm('Delete this time entry?')) return;
+  const handleDeleteTimeEntry = (entryId) => setConfirmDeleteTimeEntry(entryId);
+  const performDeleteTimeEntry = async () => {
+    const entryId = confirmDeleteTimeEntry;
     const prev = timeEntries;
     setTimeEntries((list) => list.filter((e) => e._id !== entryId));
     try {
@@ -116,6 +120,8 @@ export default function TaskDetailModal({ taskId, onClose }) {
     } catch (err) {
       setTimeEntries(prev);
       alert(err.response?.data?.message || 'Failed to delete time entry.');
+    } finally {
+      setConfirmDeleteTimeEntry(null);
     }
   };
   const handlePostComment = async (e) => {
@@ -135,8 +141,9 @@ export default function TaskDetailModal({ taskId, onClose }) {
       setPosting(false);
     }
   };
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm('Delete this comment?')) return;
+  const handleDeleteComment = (commentId) => setConfirmDeleteComment(commentId);
+  const performDeleteComment = async () => {
+    const commentId = confirmDeleteComment;
     const prev = activity;
     setActivity((list) => list.filter((a) => a._id !== commentId));
     try {
@@ -144,10 +151,13 @@ export default function TaskDetailModal({ taskId, onClose }) {
     } catch (err) {
       setActivity(prev);
       alert(err.response?.data?.message || 'Failed to delete comment.');
+    } finally {
+      setConfirmDeleteComment(null);
     }
   };
   return (
-    <Modal title={loading ? 'Loading task…' : task?.title || 'Task details'} onClose={onClose} width={560}>
+    <>
+      <Modal title={loading ? 'Loading task…' : task?.title || 'Task details'} onClose={onClose} width={560}>
       {loading && (
         <div
           style={{
@@ -669,7 +679,28 @@ export default function TaskDetailModal({ taskId, onClose }) {
           </div>
         </div>
       )}
-    </Modal>
+      </Modal>
+
+      {confirmDeleteTimeEntry && (
+        <ConfirmModal
+          title="Delete time entry"
+          message="Delete this time entry? This cannot be undone."
+          confirmLabel="Delete entry"
+          onConfirm={performDeleteTimeEntry}
+          onClose={() => setConfirmDeleteTimeEntry(null)}
+        />
+      )}
+
+      {confirmDeleteComment && (
+        <ConfirmModal
+          title="Delete comment"
+          message="Delete this comment? This cannot be undone."
+          confirmLabel="Delete comment"
+          onConfirm={performDeleteComment}
+          onClose={() => setConfirmDeleteComment(null)}
+        />
+      )}
+    </>
   );
 }
 function formatDaysAbsolute(deadline) {

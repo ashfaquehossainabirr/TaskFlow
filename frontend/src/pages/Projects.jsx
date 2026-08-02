@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import ProjectFormModal from '../components/ProjectFormModal';
+import ConfirmModal from '../components/ConfirmModal';
 import { ProjectStatusBadge } from '../components/ProjectStatusBadge';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
@@ -15,6 +16,7 @@ export default function Projects() {
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [search, setSearch] = useState('');
+  const [confirmDeleteProject, setConfirmDeleteProject] = useState(null);
   const debouncedSearch = useDebounce(search, 400);
   const load = async () => {
     setLoading(true);
@@ -39,13 +41,16 @@ export default function Projects() {
       await api.post('/projects', form);
     }
   };
-  const handleDelete = async (project) => {
-    if (!window.confirm(`Delete "${project.name}"? This cannot be undone.`)) return;
+  const handleDelete = (project) => setConfirmDeleteProject(project);
+  const performDelete = async () => {
+    const project = confirmDeleteProject;
     try {
       await api.delete(`/projects/${project._id}`);
       setProjects((list) => list.filter((p) => p._id !== project._id));
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to delete project');
+    } finally {
+      setConfirmDeleteProject(null);
     }
   };
   return (
@@ -250,6 +255,16 @@ export default function Projects() {
             load();
           }}
           onSubmit={handleSubmit}
+        />
+      )}
+
+      {confirmDeleteProject && (
+        <ConfirmModal
+          title="Delete project"
+          message={`Delete "${confirmDeleteProject.name}"? This cannot be undone.`}
+          confirmLabel="Delete project"
+          onConfirm={performDelete}
+          onClose={() => setConfirmDeleteProject(null)}
         />
       )}
     </PageShell>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import PageShell from '../components/PageShell';
 import TaskFormModal from '../components/TaskFormModal';
 import TaskDetailModal from '../components/TaskDetailModal';
+import ConfirmModal from '../components/ConfirmModal';
 import DeadlineChip from '../components/DeadlineChip';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
@@ -27,6 +28,7 @@ export default function KanbanBoard() {
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [detailTaskId, setDetailTaskId] = useState(null);
+  const [confirmDeleteTask, setConfirmDeleteTask] = useState(null);
   const loadTasks = async () => {
     setLoading(true);
     try {
@@ -94,13 +96,16 @@ export default function KanbanBoard() {
       await api.post('/tasks', form);
     }
   };
-  const handleDelete = async (task) => {
-    if (!window.confirm(`Delete "${task.title}"? This cannot be undone.`)) return;
+  const handleDelete = (task) => setConfirmDeleteTask(task);
+  const performDelete = async () => {
+    const task = confirmDeleteTask;
     try {
       await api.delete(`/tasks/${task._id}`);
       setTasks((ts) => ts.filter((t) => t._id !== task._id));
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to delete task');
+    } finally {
+      setConfirmDeleteTask(null);
     }
   };
   const columns = STATUS_ORDER.map((status) => ({
@@ -362,6 +367,16 @@ export default function KanbanBoard() {
       )}
 
       {detailTaskId && <TaskDetailModal taskId={detailTaskId} onClose={() => setDetailTaskId(null)} />}
+
+      {confirmDeleteTask && (
+        <ConfirmModal
+          title="Delete task"
+          message={`Delete "${confirmDeleteTask.title}"? This cannot be undone.`}
+          confirmLabel="Delete task"
+          onConfirm={performDelete}
+          onClose={() => setConfirmDeleteTask(null)}
+        />
+      )}
     </PageShell>
   );
 }
