@@ -5,6 +5,7 @@ import TaskTable from '../components/TaskTable';
 import TaskDetailModal from '../components/TaskDetailModal';
 import MilestoneFormModal from '../components/MilestoneFormModal';
 import ConfirmModal from '../components/ConfirmModal';
+import ProgressBar from '../components/ProgressBar';
 import { ProjectStatusBadge, MilestoneStatusBadge } from '../components/ProjectStatusBadge';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
@@ -131,6 +132,17 @@ export default function ProjectDetail() {
   const sortedMilestones = [...(project.milestones || [])].sort(
     (a, b) => new Date(a.dueDate) - new Date(b.dueDate)
   );
+  const completedMilestones = sortedMilestones.filter((m) => m.status === 'completed').length;
+  const milestonePct =
+    sortedMilestones.length > 0 ? Math.round((completedMilestones / sortedMilestones.length) * 100) : 0;
+  const tasksByMilestone = tasks.reduce((acc, t) => {
+    const key = t.milestone || 'unassigned';
+    if (!acc[key]) acc[key] = { total: 0, delivered: 0 };
+    acc[key].total += 1;
+    if (t.status === 'delivered') acc[key].delivered += 1;
+    return acc;
+  }, {});
+  const unassignedTaskCount = tasksByMilestone.unassigned?.total || 0;
   return (
     <PageShell
       title={project.name}
@@ -143,6 +155,65 @@ export default function ProjectDetail() {
         )
       }
     >
+      <style>{`
+        .pd-milestones-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 14px;
+          flex-wrap: wrap;
+        }
+        .pd-progress-row {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          margin-bottom: 16px;
+        }
+        .pd-progress-bar-wrap {
+          flex: 1;
+          max-width: 320px;
+        }
+        .pd-milestone-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 14px 18px;
+          flex-wrap: wrap;
+        }
+        .pd-milestone-meta {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-shrink: 0;
+          flex-wrap: wrap;
+        }
+        .pd-milestone-actions {
+          display: flex;
+          gap: 6px;
+        }
+        @media (max-width: 640px) {
+          .pd-progress-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+          }
+          .pd-progress-bar-wrap {
+            max-width: none;
+          }
+        }
+        @media (max-width: 480px) {
+          .pd-milestone-row {
+            padding: 12px 14px;
+          }
+          .pd-milestone-meta {
+            width: 100%;
+            justify-content: space-between;
+          }
+        }
+      `}</style>
+
       <Link
         to="/projects"
         style={{
@@ -204,14 +275,7 @@ export default function ProjectDetail() {
         </p>
       )}
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 14,
-        }}
-      >
+      <div className="pd-milestones-header">
         <h2
           style={{
             fontFamily: 'var(--font-display)',
@@ -235,6 +299,24 @@ export default function ProjectDetail() {
         )}
       </div>
 
+      {sortedMilestones.length > 0 && (
+        <div className="pd-progress-row">
+          <div className="pd-progress-bar-wrap">
+            <ProgressBar value={completedMilestones} max={sortedMilestones.length} color="var(--status-delivered)" />
+          </div>
+          <span
+            className="mono"
+            style={{
+              fontSize: 12.5,
+              color: 'var(--text-secondary)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {completedMilestones} of {sortedMilestones.length} milestones completed ({milestonePct}%)
+          </span>
+        </div>
+      )}
+
       {sortedMilestones.length === 0 ? (
         <div
           style={{
@@ -255,22 +337,17 @@ export default function ProjectDetail() {
             background: 'var(--bg-panel)',
             border: '1px solid var(--border-hairline-soft)',
             borderRadius: 'var(--radius-lg)',
-            marginBottom: 32,
+            marginBottom: unassignedTaskCount > 0 ? 10 : 32,
             overflow: 'hidden',
           }}
         >
           {sortedMilestones.map((m, i) => (
             <div
               key={m._id}
+              className="pd-milestone-row"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 12,
-                padding: '14px 18px',
                 borderBottom:
                   i === sortedMilestones.length - 1 ? 'none' : '1px solid var(--border-hairline-soft)',
-                flexWrap: 'wrap',
               }}
             >
               <div
@@ -299,15 +376,19 @@ export default function ProjectDetail() {
                     {m.description}
                   </div>
                 )}
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: 'var(--text-muted)',
+                    marginTop: 4,
+                  }}
+                >
+                  {tasksByMilestone[m._id]?.total
+                    ? `${tasksByMilestone[m._id].total} task${tasksByMilestone[m._id].total === 1 ? '' : 's'} · ${tasksByMilestone[m._id].delivered} delivered`
+                    : 'No tasks linked'}
+                </div>
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  flexShrink: 0,
-                }}
-              >
+              <div className="pd-milestone-meta">
                 <span
                   className="mono"
                   style={{
@@ -319,12 +400,7 @@ export default function ProjectDetail() {
                 </span>
                 <MilestoneStatusBadge status={m.status} />
                 {isAdmin && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: 6,
-                    }}
-                  >
+                  <div className="pd-milestone-actions">
                     <button
                       onClick={() => {
                         setEditingMilestone(m);
@@ -348,6 +424,18 @@ export default function ProjectDetail() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {sortedMilestones.length > 0 && unassignedTaskCount > 0 && (
+        <div
+          style={{
+            fontSize: 12.5,
+            color: 'var(--text-muted)',
+            marginBottom: 32,
+          }}
+        >
+          {unassignedTaskCount} task{unassignedTaskCount === 1 ? '' : 's'} not linked to a milestone
         </div>
       )}
 
