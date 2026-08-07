@@ -177,6 +177,16 @@ textarea:focus-visible {
   letter-spacing: -0.01em;
 }
 
+.nav-link.active .nav-label {
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover:not(.nav-link.active) .nav-label {
+  color: var(--accent-cyan);
+  transition: color 0.2s ease;
+}
+
 .project-card {
   background: var(--bg-panel);
   border: 1px solid var(--border-hairline-soft);
