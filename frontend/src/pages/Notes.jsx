@@ -3,7 +3,9 @@ import PageShell from '../components/PageShell';
 import NoteModal, { NOTE_COLORS } from '../components/NoteModal';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
+
 const colorSwatch = (color) => NOTE_COLORS.find((c) => c.value === color)?.swatch || NOTE_COLORS[0].swatch;
+
 export default function Notes() {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,6 +13,7 @@ export default function Notes() {
   const debouncedSearch = useDebounce(search, 350);
   const [activeNote, setActiveNote] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
   const load = async () => {
     setLoading(true);
     try {
@@ -24,17 +27,21 @@ export default function Notes() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     load();
   }, [debouncedSearch]);
+
   const openNew = () => {
     setActiveNote(null);
     setShowModal(true);
   };
+
   const openNote = (note) => {
     setActiveNote(note);
     setShowModal(true);
   };
+
   const handleSaved = (saved) => {
     setNotes((list) => {
       const exists = list.some((n) => n._id === saved._id);
@@ -43,10 +50,12 @@ export default function Notes() {
     });
     setShowModal(false);
   };
+
   const handleDeleted = (id) => {
     setNotes((list) => list.filter((n) => n._id !== id));
     setShowModal(false);
   };
+  
   return (
     <PageShell
       title="My Notes"

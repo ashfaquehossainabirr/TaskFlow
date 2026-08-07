@@ -1,4 +1,5 @@
 import { formatDaysRemaining, urgencyLevel } from '../utils/deadline';
+
 const STYLES = {
   overdue: {
     color: 'var(--text-error)',
@@ -31,13 +32,16 @@ const STYLES = {
     pulse: false,
   },
 };
+
 export default function DeadlineChip({ deadline, status }) {
   const level = urgencyLevel(deadline, status);
   const s = STYLES[level];
+  
   const dateLabel = new Date(deadline).toLocaleDateString(undefined, {
     month: 'short',
     day: 'numeric',
   });
+
   return (
     <span
       className="mono"

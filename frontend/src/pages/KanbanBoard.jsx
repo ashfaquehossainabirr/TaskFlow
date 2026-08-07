@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { STATUS_LABELS, STATUS_ORDER } from '../utils/deadline';
 import { canManageTasks } from '../utils/roles';
+
 const COLUMN_COLORS = {
   todo: 'var(--status-todo)',
   'in-progress': 'var(--status-progress)',
@@ -15,6 +16,7 @@ const COLUMN_COLORS = {
   delivered: 'var(--status-delivered)',
   cancelled: 'var(--status-cancelled)',
 };
+
 export default function KanbanBoard() {
   const { user } = useAuth();
   const isAdmin = canManageTasks(user.role);
@@ -114,6 +116,7 @@ export default function KanbanBoard() {
     color: COLUMN_COLORS[status],
     tasks: tasks.filter((t) => t.status === status),
   }));
+  
   return (
     <PageShell
       title="Kanban Board"

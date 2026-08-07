@@ -3,11 +3,13 @@ import Modal from './Modal';
 import TaskTable from './TaskTable';
 import TaskDetailModal from './TaskDetailModal';
 import api from '../api/axios';
+
 export default function StatusTasksModal({ status, statusLabel, onClose }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [detailTaskId, setDetailTaskId] = useState(null);
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -27,10 +29,12 @@ export default function StatusTasksModal({ status, statusLabel, onClose }) {
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
+
     return () => {
       cancelled = true;
     };
   }, [status]);
+  
   return (
     <Modal title={`${statusLabel} tasks`} onClose={onClose} width={800}>
       {loading && (

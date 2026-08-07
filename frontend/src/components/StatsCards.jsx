@@ -25,6 +25,7 @@ const CARDS = [
     color: 'var(--status-cancelled)',
   },
 ];
+
 export default function StatsCards({ stats, loading, onCardClick }) {
   return (
     <div

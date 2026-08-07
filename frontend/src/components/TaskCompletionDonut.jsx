@@ -1,8 +1,10 @@
 import DonutChart from './DonutChart';
+
 export default function TaskCompletionDonut({ stats, loading }) {
   const total = stats?.total ?? 0;
   const completed = stats?.delivered ?? 0;
   const pending = Math.max(0, total - completed);
+  
   const segments = [
     {
       label: 'Pending',
@@ -15,6 +17,7 @@ export default function TaskCompletionDonut({ stats, loading }) {
       color: 'var(--status-delivered)',
     },
   ];
+
   return (
     <div
       style={{

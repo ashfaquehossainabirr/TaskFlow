@@ -5,6 +5,7 @@ const PROJECT_STATUS_LABELS = {
   completed: 'Completed',
   cancelled: 'Cancelled',
 };
+
 const PROJECT_STATUS_COLORS = {
   planning: 'var(--status-todo)',
   active: 'var(--status-progress)',
@@ -12,16 +13,19 @@ const PROJECT_STATUS_COLORS = {
   completed: 'var(--status-delivered)',
   cancelled: 'var(--status-cancelled)',
 };
+
 const MILESTONE_STATUS_LABELS = {
   pending: 'Pending',
   'in-progress': 'In Progress',
   completed: 'Completed',
 };
+
 const MILESTONE_STATUS_COLORS = {
   pending: 'var(--status-todo)',
   'in-progress': 'var(--status-progress)',
   completed: 'var(--status-delivered)',
 };
+
 export function ProjectStatusBadge({ status }) {
   return (
     <span

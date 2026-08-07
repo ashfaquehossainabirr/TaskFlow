@@ -1,7 +1,9 @@
 import { useTheme } from '../context/ThemeContext';
+
 export default function ThemeToggle({ compact = false }) {
   const { theme, toggleTheme } = useTheme();
   const isLight = theme === 'light';
+
   if (compact) {
     return (
       <button
@@ -25,6 +27,7 @@ export default function ThemeToggle({ compact = false }) {
       </button>
     );
   }
+  
   return (
     <button
       onClick={toggleTheme}

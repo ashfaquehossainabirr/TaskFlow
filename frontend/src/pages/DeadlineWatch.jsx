@@ -5,12 +5,14 @@ import TaskDetailModal from '../components/TaskDetailModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { canManageTasks } from '../utils/roles';
+
 export default function DeadlineWatch() {
   const { user } = useAuth();
   const isAdmin = canManageTasks(user.role);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [detailTaskId, setDetailTaskId] = useState(null);
+
   const load = async () => {
     setLoading(true);
     try {
@@ -20,9 +22,11 @@ export default function DeadlineWatch() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     load();
   }, []);
+
   const handleStatusChange = async (task, status) => {
     const prev = tasks;
     setTasks((ts) =>
@@ -35,6 +39,7 @@ export default function DeadlineWatch() {
           : t
       )
     );
+
     try {
       await api.patch(`/tasks/${task._id}/status`, {
         status,
@@ -47,6 +52,7 @@ export default function DeadlineWatch() {
       alert(err.response?.data?.message || 'Failed to update status');
     }
   };
+  
   return (
     <PageShell title="Deadline Watch" subtitle="Every open task due in 3 days or less, soonest first.">
       <div

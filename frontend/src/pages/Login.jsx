@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
+
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -26,6 +28,7 @@ export default function Login() {
       setLoading(false);
     }
   };
+  
   return (
     <div className="login-wrapper">
       <div className="login-left">

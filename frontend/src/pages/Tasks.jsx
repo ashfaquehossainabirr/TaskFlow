@@ -9,6 +9,7 @@ import api from '../api/axios';
 import { STATUS_LABELS } from '../utils/deadline';
 import { canManageTasks } from '../utils/roles';
 import useDebounce from '../hooks/useDebounce';
+
 export default function Tasks() {
   const { user } = useAuth();
   const isManager = canManageTasks(user.role);
@@ -25,6 +26,7 @@ export default function Tasks() {
   const [detailTaskId, setDetailTaskId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [confirmDeleteTask, setConfirmDeleteTask] = useState(null);
+
   const loadTasks = async () => {
     setLoading(true);
     try {
@@ -40,6 +42,7 @@ export default function Tasks() {
       setLoading(false);
     }
   };
+
   const loadEmployees = async () => {
     if (!isManager) return;
     const res = await api.get('/users', {
@@ -49,19 +52,24 @@ export default function Tasks() {
     });
     setEmployees(res.data);
   };
+
   const loadProjects = async () => {
     const res = await api.get('/projects');
     setProjects(res.data);
   };
+
   useEffect(() => {
     loadEmployees();
     loadProjects();
   }, []);
+
   useEffect(() => {
     loadTasks();
   }, [statusFilter, projectFilter, debouncedSearch]);
+
   const handleStatusChange = async (task, status) => {
     const prev = tasks;
+
     setTasks((ts) =>
       ts.map((t) =>
         t._id === task._id
@@ -72,6 +80,7 @@ export default function Tasks() {
           : t
       )
     );
+
     try {
       await api.patch(`/tasks/${task._id}/status`, {
         status,
@@ -81,6 +90,7 @@ export default function Tasks() {
       alert(err.response?.data?.message || 'Failed to update status');
     }
   };
+
   const handleSubmit = async (form, taskId) => {
     if (taskId) {
       await api.put(`/tasks/${taskId}`, form);
@@ -88,10 +98,14 @@ export default function Tasks() {
       await api.post('/tasks', form);
     }
   };
+
   const handleDelete = (task) => setConfirmDeleteTask(task);
+
   const performDelete = async () => {
     const task = confirmDeleteTask;
+
     setDeletingId(task._id);
+    
     try {
       await api.delete(`/tasks/${task._id}`);
       setTasks((ts) => ts.filter((t) => t._id !== task._id));
@@ -110,6 +124,7 @@ export default function Tasks() {
       setConfirmDeleteTask(null);
     }
   };
+
   return (
     <PageShell
       title={isManager ? 'All Tasks' : 'My Tasks'}

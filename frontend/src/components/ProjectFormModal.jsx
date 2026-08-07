@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Modal from './Modal';
 import { fieldWrap, labelStyle, inputStyle, primaryBtn, secondaryBtn, errorBanner } from './formStyles';
 import { PROJECT_STATUS_LABELS } from './ProjectStatusBadge';
+
 const toDateInputValue = (d) => {
   if (!d) return '';
   const date = new Date(d);
@@ -9,8 +10,10 @@ const toDateInputValue = (d) => {
   const local = new Date(date.getTime() - offset * 60000);
   return local.toISOString().slice(0, 10);
 };
+
 export default function ProjectFormModal({ project, onClose, onSaved, onSubmit }) {
   const isEdit = Boolean(project);
+
   const [form, setForm] = useState({
     name: project?.name || '',
     description: project?.description || '',
@@ -19,16 +22,20 @@ export default function ProjectFormModal({ project, onClose, onSaved, onSubmit }
     startDate: toDateInputValue(project?.startDate) || '',
     targetEndDate: toDateInputValue(project?.targetEndDate) || '',
   });
+
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
   const update = (key) => (e) =>
     setForm((f) => ({
       ...f,
       [key]: e.target.value,
     }));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
     if (!form.name.trim()) {
       setError('Project name is required.');
       return;
@@ -43,6 +50,7 @@ export default function ProjectFormModal({ project, onClose, onSaved, onSubmit }
       setSaving(false);
     }
   };
+
   return (
     <Modal title={isEdit ? 'Edit project' : 'New project'} onClose={onClose} width={520}>
       <style>{`

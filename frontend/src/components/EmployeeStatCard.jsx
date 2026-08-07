@@ -1,4 +1,5 @@
 import { formatMoney, exactMoney } from '../utils/currency';
+
 const MINI_STATS = [
   {
     key: 'todo',
@@ -26,6 +27,7 @@ const MINI_STATS = [
     color: 'var(--status-cancelled)',
   },
 ];
+
 const AVATAR_PALETTE = [
   'var(--accent-cyan)',
   'var(--status-progress)',
@@ -33,17 +35,20 @@ const AVATAR_PALETTE = [
   'var(--status-delivered)',
   'var(--status-cancelled)',
 ];
+
 function hashColor(str = '') {
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
   return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
 }
+
 function initials(name = '') {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return '?';
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
+
 export default function EmployeeStatCard({ employee, onClick }) {
   const hasTarget = employee.minimumTarget !== null && employee.minimumTarget !== undefined;
   const deliveredValue = Number(employee.deliveredValue ?? 0);
@@ -53,6 +58,7 @@ export default function EmployeeStatCard({ employee, onClick }) {
   const progressPct = hasTarget && target > 0 ? Math.min(100, (deliveredValue / target) * 100) : 0;
   const total = MINI_STATS.reduce((sum, s) => sum + Number(employee[s.key] ?? 0), 0);
   const avatarColor = hashColor(employee.name);
+  
   return (
     <div onClick={onClick} className="employee-stat-card">
       <div className="esc-header">

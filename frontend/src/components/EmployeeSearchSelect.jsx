@@ -17,7 +17,6 @@ export default function EmployeeSearchSelect({
 
   const selected = useMemo(() => employees.find((e) => e._id === value) || null, [employees, value]);
 
-  // Keep the input text in sync with the selected employee when not actively editing.
   useEffect(() => {
     if (!isOpen) {
       setQuery(selected ? displayName(selected) : '');
@@ -51,7 +50,6 @@ export default function EmployeeSearchSelect({
   const openList = () => {
     setIsOpen(true);
     setHighlighted(0);
-    // Let the user start typing fresh without clearing the field first.
     requestAnimationFrame(() => inputRef.current?.select());
   };
 

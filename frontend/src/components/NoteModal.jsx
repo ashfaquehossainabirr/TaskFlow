@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Modal from './Modal';
 import api from '../api/axios';
 import { fieldWrap, labelStyle, inputStyle, primaryBtn, secondaryBtn, errorBanner } from './formStyles';
+
 export const NOTE_COLORS = [
   {
     value: 'default',
@@ -34,7 +35,9 @@ export const NOTE_COLORS = [
     swatch: '#a78bfa',
   },
 ];
+
 const colorSwatch = (color) => NOTE_COLORS.find((c) => c.value === color)?.swatch || NOTE_COLORS[0].swatch;
+
 const formatDate = (iso) =>
   new Date(iso).toLocaleString(undefined, {
     month: 'short',
@@ -43,24 +46,29 @@ const formatDate = (iso) =>
     hour: 'numeric',
     minute: '2-digit',
   });
+
 export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
   const isNew = !note;
   const [editing, setEditing] = useState(isNew);
+
   const [form, setForm] = useState({
     title: note?.title || '',
     content: note?.content || '',
     color: note?.color || 'default',
     pinned: note?.pinned || false,
   });
+
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+
   const update = (key) => (e) =>
     setForm((f) => ({
       ...f,
       [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
     }));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -85,6 +93,7 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
       setSaving(false);
     }
   };
+
   const handleDelete = async () => {
     setDeleting(true);
     setError('');
@@ -96,7 +105,9 @@ export default function NoteModal({ note, onClose, onSaved, onDeleted }) {
       setDeleting(false);
     }
   };
+
   const title = isNew ? 'New note' : editing ? 'Edit note' : note.title;
+  
   return (
     <Modal title={title} onClose={onClose} width={520}>
       {error && <div style={errorBanner}>{error}</div>}

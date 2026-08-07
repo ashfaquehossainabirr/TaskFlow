@@ -3,6 +3,7 @@ import Modal from './Modal';
 import EmployeeSearchSelect from './EmployeeSearchSelect';
 import { fieldWrap, labelStyle, inputStyle, primaryBtn, secondaryBtn, errorBanner } from './formStyles';
 import { STATUS_LABELS } from '../utils/deadline';
+
 const toDateInputValue = (d) => {
   if (!d) return '';
   const date = new Date(d);
@@ -10,6 +11,7 @@ const toDateInputValue = (d) => {
   const local = new Date(date.getTime() - offset * 60000);
   return local.toISOString().slice(0, 10);
 };
+
 export default function TaskFormModal({ task, employees, projects, onClose, onSaved, onSubmit }) {
   const isEdit = Boolean(task);
   const [form, setForm] = useState({
@@ -23,8 +25,10 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
     assignedTo: task?.assignedTo?._id || task?.assignedTo || '',
     status: task?.status || 'todo',
   });
+
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
   const update = (key) => (e) =>
     setForm((f) => ({
       ...f,
@@ -35,11 +39,14 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
           }
         : {}),
     }));
+
   const gridFieldWrap = { ...fieldWrap, marginBottom: 0 };
+
   const availableMilestones = useMemo(() => {
     const selected = projects.find((p) => p._id === form.project);
     return selected?.milestones || [];
   }, [projects, form.project]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -62,6 +69,7 @@ export default function TaskFormModal({ task, employees, projects, onClose, onSa
       setSaving(false);
     }
   };
+  
   return (
     <Modal title={isEdit ? 'Edit task' : 'Create & assign task'} onClose={onClose} width={640}>
       <style>{`

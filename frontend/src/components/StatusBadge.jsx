@@ -1,4 +1,5 @@
 import { STATUS_LABELS } from '../utils/deadline';
+
 const DOT_COLOR = {
   todo: 'var(--status-todo)',
   'in-progress': 'var(--status-progress)',
@@ -6,6 +7,7 @@ const DOT_COLOR = {
   cancelled: 'var(--status-cancelled)',
   hold: 'var(--status-hold)',
 };
+
 export default function StatusBadge({ status }) {
   return (
     <span

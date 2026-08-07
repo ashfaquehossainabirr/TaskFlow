@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Modal from './Modal';
 import { fieldWrap, labelStyle, inputStyle, primaryBtn, secondaryBtn, errorBanner } from './formStyles';
+
 export default function UserFormModal({ user, managers, currentUser, onClose, onSaved, onSubmit }) {
   const isEdit = Boolean(user);
   const isSelf = isEdit && String(user._id) === String(currentUser._id);
@@ -10,6 +11,7 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
   const canEditRole = viewerIsMainAdmin || !targetIsAdmin;
   const showAdminRoleOption = viewerIsMainAdmin || targetIsAdmin;
   const canEditPassword = isSelf || !targetIsAdmin || viewerIsMainAdmin;
+
   const [form, setForm] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -21,8 +23,10 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
     isActive: user?.isActive ?? true,
     makeMainAdmin: false,
   });
+
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
   const update = (key) => (e) =>
     setForm((f) => ({
       ...f,
@@ -34,14 +38,18 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
           }
         : {}),
     }));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
     if (!form.name || !form.email || (!isEdit && !form.password)) {
       setError('Name, email and password are required.');
       return;
     }
+
     setSaving(true);
+
     try {
       const payload = {
         ...form,
@@ -62,6 +70,7 @@ export default function UserFormModal({ user, managers, currentUser, onClose, on
       setSaving(false);
     }
   };
+  
   return (
     <Modal title={isEdit ? 'Edit user' : 'Create new user'} onClose={onClose} width={460}>
       <style>{`

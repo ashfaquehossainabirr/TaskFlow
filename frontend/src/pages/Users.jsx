@@ -5,11 +5,13 @@ import ConfirmModal from '../components/ConfirmModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
+
 const ROLE_COLORS = {
   admin: 'var(--accent-cyan)',
   manager: 'var(--status-hold)',
   employee: 'var(--text-secondary)',
 };
+
 export default function Users() {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
@@ -20,6 +22,7 @@ export default function Users() {
   const [deletingId, setDeletingId] = useState(null);
   const [confirmDeleteUser, setConfirmDeleteUser] = useState(null);
   const debouncedSearch = useDebounce(search, 400);
+
   const load = async () => {
     setLoading(true);
     try {
@@ -33,10 +36,13 @@ export default function Users() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     load();
   }, [debouncedSearch]);
+
   const managers = useMemo(() => users.filter((u) => u.role === 'manager'), [users]);
+
   const managerNameById = useMemo(() => {
     const map = {};
     managers.forEach((m) => {
@@ -44,6 +50,7 @@ export default function Users() {
     });
     return map;
   }, [managers]);
+
   const handleSubmit = async (form, userId) => {
     if (userId) {
       await api.put(`/users/${userId}`, form);
@@ -51,15 +58,20 @@ export default function Users() {
       await api.post('/users', form);
     }
   };
+
   const canDeleteUser = (target) => {
     if (target.isMainAdmin) return false;
     if (target.role !== 'admin') return true;
     return Boolean(currentUser.isMainAdmin);
   };
+
   const handleDelete = (u) => setConfirmDeleteUser(u);
+
   const performDelete = async () => {
     const u = confirmDeleteUser;
+
     setDeletingId(u._id);
+
     try {
       await api.delete(`/users/${u._id}`);
       setUsers((list) => list.filter((x) => x._id !== u._id));
@@ -82,6 +94,7 @@ export default function Users() {
       setConfirmDeleteUser(null);
     }
   };
+  
   return (
     <PageShell
       title="Team & Access"

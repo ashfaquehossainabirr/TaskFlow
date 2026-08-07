@@ -5,6 +5,7 @@ import EmployeeTasksModal from '../components/EmployeeTasksModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
+
 export default function EmployeeStats() {
   const { user } = useAuth();
   const isAdmin = user.role === 'admin';
@@ -14,6 +15,7 @@ export default function EmployeeStats() {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 400);
+
   useEffect(() => {
     setLoading(true);
     api
@@ -22,6 +24,7 @@ export default function EmployeeStats() {
       .catch((err) => setError(err.response?.data?.message || 'Failed to load employee stats.'))
       .finally(() => setLoading(false));
   }, []);
+
   const filteredEmployees = useMemo(() => {
     const term = debouncedSearch.trim().toLowerCase();
     if (!term) return employees;
@@ -33,6 +36,7 @@ export default function EmployeeStats() {
       );
     });
   }, [employees, debouncedSearch]);
+  
   return (
     <PageShell
       title={isAdmin ? 'Employee Stats' : 'My Team'}

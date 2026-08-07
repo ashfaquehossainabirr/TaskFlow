@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import Sidebar from './Sidebar';
+
 export default function PageShell({ title, subtitle, actions, children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
   return (
     <div className="page-shell">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />

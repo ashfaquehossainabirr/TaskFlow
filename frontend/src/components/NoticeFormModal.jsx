@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import Modal from './Modal';
 import { fieldWrap, labelStyle, inputStyle, primaryBtn, secondaryBtn, errorBanner } from './formStyles';
+
 const PRIORITY_LABELS = {
   normal: 'Normal',
   important: 'Important',
   urgent: 'Urgent',
 };
+
 export default function NoticeFormModal({ onClose, onSaved, onSubmit }) {
   const [form, setForm] = useState({
     title: '',
@@ -13,13 +15,16 @@ export default function NoticeFormModal({ onClose, onSaved, onSubmit }) {
     priority: 'normal',
     pinned: false,
   });
+
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
   const update = (key) => (e) =>
     setForm((f) => ({
       ...f,
       [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
     }));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -37,6 +42,7 @@ export default function NoticeFormModal({ onClose, onSaved, onSubmit }) {
       setSaving(false);
     }
   };
+  
   return (
     <Modal title="Post a notice" onClose={onClose} width={480}>
       <style>{`

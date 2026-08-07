@@ -9,6 +9,7 @@ import { useTimer } from '../context/TimerContext';
 import { daysRemaining } from '../utils/deadline';
 import { formatStopwatch, formatDurationShort } from '../utils/time';
 import { formatMoney, exactMoney } from '../utils/currency';
+
 const row = {
   display: 'flex',
   justifyContent: 'space-between',
@@ -16,12 +17,14 @@ const row = {
   padding: '11px 0',
   borderBottom: '1px solid var(--border-hairline-soft)',
 };
+
 const rowLabel = {
   fontSize: 12.5,
   color: 'var(--text-muted)',
   fontWeight: 600,
   flexShrink: 0,
 };
+
 const rowValue = {
   fontSize: 13.5,
   color: 'var(--text-primary)',
@@ -29,6 +32,7 @@ const rowValue = {
   wordBreak: 'break-word',
   minWidth: 0,
 };
+
 export default function TaskDetailModal({ taskId, onClose }) {
   const { user } = useAuth();
   const { activeEntry, elapsedSeconds, startTimer, stopTimer } = useTimer();
@@ -45,6 +49,7 @@ export default function TaskDetailModal({ taskId, onClose }) {
   const [timeEntries, setTimeEntries] = useState([]);
   const [timeError, setTimeError] = useState('');
   const [timerBusy, setTimerBusy] = useState(false);
+
   const loadActivity = () => {
     setActivityLoading(true);
     return api
@@ -53,6 +58,7 @@ export default function TaskDetailModal({ taskId, onClose }) {
       .catch(() => {})
       .finally(() => setActivityLoading(false));
   };
+
   const loadTimeEntries = () => {
     return api
       .get('/time-entries', {
@@ -63,6 +69,7 @@ export default function TaskDetailModal({ taskId, onClose }) {
       .then((res) => setTimeEntries(res.data))
       .catch(() => {});
   };
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -78,16 +85,20 @@ export default function TaskDetailModal({ taskId, onClose }) {
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
+
     loadActivity();
     loadTimeEntries();
+
     return () => {
       cancelled = true;
     };
   }, [taskId]);
+
   const isThisTaskActive = Boolean(activeEntry && String(activeEntry.task?._id) === String(taskId));
   const isOtherTaskActive = Boolean(activeEntry && !isThisTaskActive);
   const loggedSeconds = timeEntries.reduce((sum, e) => sum + (e.durationSeconds || 0), 0);
   const totalSeconds = loggedSeconds + (isThisTaskActive ? elapsedSeconds : 0);
+
   const handleStartTimer = async () => {
     setTimeError('');
     setTimerBusy(true);
@@ -99,6 +110,7 @@ export default function TaskDetailModal({ taskId, onClose }) {
       setTimerBusy(false);
     }
   };
+
   const handleStopTimer = async () => {
     setTimerBusy(true);
     try {
@@ -110,7 +122,9 @@ export default function TaskDetailModal({ taskId, onClose }) {
       setTimerBusy(false);
     }
   };
+
   const handleDeleteTimeEntry = (entryId) => setConfirmDeleteTimeEntry(entryId);
+
   const performDeleteTimeEntry = async () => {
     const entryId = confirmDeleteTimeEntry;
     const prev = timeEntries;
@@ -124,6 +138,7 @@ export default function TaskDetailModal({ taskId, onClose }) {
       setConfirmDeleteTimeEntry(null);
     }
   };
+
   const handlePostComment = async (e) => {
     e.preventDefault();
     if (!commentText.trim()) return;
@@ -141,7 +156,9 @@ export default function TaskDetailModal({ taskId, onClose }) {
       setPosting(false);
     }
   };
+
   const handleDeleteComment = (commentId) => setConfirmDeleteComment(commentId);
+
   const performDeleteComment = async () => {
     const commentId = confirmDeleteComment;
     const prev = activity;
@@ -155,6 +172,7 @@ export default function TaskDetailModal({ taskId, onClose }) {
       setConfirmDeleteComment(null);
     }
   };
+  
   return (
     <>
       <Modal title={loading ? 'Loading task…' : task?.title || 'Task details'} onClose={onClose} width={560}>

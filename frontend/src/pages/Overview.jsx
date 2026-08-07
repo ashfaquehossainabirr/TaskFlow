@@ -11,6 +11,7 @@ import StatusTasksModal from '../components/StatusTasksModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { canManageTasks } from '../utils/roles';
+
 export default function Overview() {
   const { user } = useAuth();
   const isManager = canManageTasks(user.role);
@@ -19,6 +20,7 @@ export default function Overview() {
   const [loading, setLoading] = useState(true);
   const [detailTaskId, setDetailTaskId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
+
   const load = async () => {
     setLoading(true);
     try {
@@ -32,9 +34,11 @@ export default function Overview() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     load();
   }, []);
+  
   return (
     <PageShell
       title={`Welcome back, ${user.name.split(' ')[0]}`}

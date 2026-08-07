@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Modal from './Modal';
 import { fieldWrap, labelStyle, inputStyle, primaryBtn, secondaryBtn, errorBanner } from './formStyles';
 import { MILESTONE_STATUS_LABELS } from './ProjectStatusBadge';
+
 const toDateInputValue = (d) => {
   if (!d) return '';
   const date = new Date(d);
@@ -9,6 +10,7 @@ const toDateInputValue = (d) => {
   const local = new Date(date.getTime() - offset * 60000);
   return local.toISOString().slice(0, 10);
 };
+
 export default function MilestoneFormModal({ milestone, onClose, onSaved, onSubmit }) {
   const isEdit = Boolean(milestone);
   const [form, setForm] = useState({
@@ -19,11 +21,13 @@ export default function MilestoneFormModal({ milestone, onClose, onSaved, onSubm
   });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+
   const update = (key) => (e) =>
     setForm((f) => ({
       ...f,
       [key]: e.target.value,
     }));
+    
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -41,6 +45,7 @@ export default function MilestoneFormModal({ milestone, onClose, onSaved, onSubm
       setSaving(false);
     }
   };
+
   return (
     <Modal title={isEdit ? 'Edit milestone' : 'New milestone'} onClose={onClose} width={460}>
       <form onSubmit={handleSubmit}>

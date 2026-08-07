@@ -4,6 +4,7 @@ export default function DonutChart({ segments, size = 160, thickness = 20, cente
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
   let cumulative = 0;
+  
   return (
     <div
       style={{

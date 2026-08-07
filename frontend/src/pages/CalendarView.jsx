@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import TaskDetailModal from '../components/TaskDetailModal';
 import api from '../api/axios';
+
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 const STATUS_COLORS = {
   todo: 'var(--status-todo)',
   'in-progress': 'var(--status-progress)',
@@ -11,15 +13,19 @@ const STATUS_COLORS = {
   delivered: 'var(--status-delivered)',
   cancelled: 'var(--status-cancelled)',
 };
+
 function startOfMonth(date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
+
 function addMonths(date, n) {
   return new Date(date.getFullYear(), date.getMonth() + n, 1);
 }
+
 function sameDay(a, b) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
+
 function buildCalendarDays(monthDate) {
   const first = startOfMonth(monthDate);
   const gridStart = new Date(first);
@@ -32,6 +38,7 @@ function buildCalendarDays(monthDate) {
   }
   return days;
 }
+
 export default function CalendarView() {
   const navigate = useNavigate();
   const today = useMemo(() => new Date(), []);
@@ -41,6 +48,7 @@ export default function CalendarView() {
   const [loading, setLoading] = useState(true);
   const [detailTaskId, setDetailTaskId] = useState(null);
   const [dayModal, setDayModal] = useState(null);
+
   useEffect(() => {
     setLoading(true);
     Promise.all([api.get('/tasks'), api.get('/projects')])
@@ -50,6 +58,7 @@ export default function CalendarView() {
       })
       .finally(() => setLoading(false));
   }, []);
+
   const milestoneEvents = useMemo(() => {
     const events = [];
     projects.forEach((p) => {
@@ -67,6 +76,7 @@ export default function CalendarView() {
     });
     return events;
   }, [projects]);
+
   const taskEvents = useMemo(
     () =>
       tasks
@@ -80,11 +90,14 @@ export default function CalendarView() {
         })),
     [tasks]
   );
+
   const days = useMemo(() => buildCalendarDays(month), [month]);
+
   const eventsForDay = (day) => [
     ...taskEvents.filter((e) => sameDay(e.date, day)),
     ...milestoneEvents.filter((e) => sameDay(e.date, day)),
   ];
+  
   return (
     <PageShell title="Calendar" subtitle="Task deadlines and project milestones, by day.">
       <div

@@ -4,6 +4,7 @@ import ConfirmModal from './ConfirmModal';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { canManageTasks } from '../utils/roles';
+
 const PRIORITY_STYLES = {
   normal: {
     label: 'Normal',
@@ -24,6 +25,7 @@ const PRIORITY_STYLES = {
     border: 'rgba(239, 100, 97, 0.35)',
   },
 };
+
 export default function NoticeBoard() {
   const { user } = useAuth();
   const canPost = canManageTasks(user.role);
@@ -32,6 +34,7 @@ export default function NoticeBoard() {
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [confirmDeleteNotice, setConfirmDeleteNotice] = useState(null);
+
   const load = async () => {
     setLoading(true);
     setError('');
@@ -44,13 +47,17 @@ export default function NoticeBoard() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     load();
   }, []);
+
   const handleSubmit = async (form) => {
     await api.post('/notices', form);
   };
+
   const handleDelete = (notice) => setConfirmDeleteNotice(notice);
+
   const performDelete = async () => {
     const notice = confirmDeleteNotice;
     const prev = notices;
@@ -64,7 +71,9 @@ export default function NoticeBoard() {
       setConfirmDeleteNotice(null);
     }
   };
+
   const canDelete = (notice) => user.role === 'admin' || String(notice.createdBy?._id) === String(user._id);
+  
   return (
     <div
       style={{

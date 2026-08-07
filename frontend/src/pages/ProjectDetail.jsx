@@ -9,6 +9,7 @@ import ProgressBar from '../components/ProgressBar';
 import { ProjectStatusBadge, MilestoneStatusBadge } from '../components/ProjectStatusBadge';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
+
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -23,9 +24,11 @@ export default function ProjectDetail() {
   const [editingMilestone, setEditingMilestone] = useState(null);
   const [confirmDeleteMilestone, setConfirmDeleteMilestone] = useState(null);
   const [confirmDeleteProject, setConfirmDeleteProject] = useState(false);
+
   const load = async () => {
     setLoading(true);
     setError('');
+
     try {
       const [projectRes, tasksRes] = await Promise.all([
         api.get(`/projects/${id}`),
@@ -43,11 +46,14 @@ export default function ProjectDetail() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     load();
   }, [id]);
+
   const handleStatusChange = async (task, status) => {
     const prev = tasks;
+
     setTasks((ts) =>
       ts.map((t) =>
         t._id === task._id
@@ -58,6 +64,7 @@ export default function ProjectDetail() {
           : t
       )
     );
+
     try {
       await api.patch(`/tasks/${task._id}/status`, {
         status,
@@ -67,6 +74,7 @@ export default function ProjectDetail() {
       alert(err.response?.data?.message || 'Failed to update status');
     }
   };
+
   const handleMilestoneSubmit = async (form, milestoneId) => {
     if (milestoneId) {
       await api.put(`/projects/${id}/milestones/${milestoneId}`, form);
@@ -74,7 +82,9 @@ export default function ProjectDetail() {
       await api.post(`/projects/${id}/milestones`, form);
     }
   };
+
   const handleMilestoneDelete = (milestone) => setConfirmDeleteMilestone(milestone);
+
   const performMilestoneDelete = async () => {
     const milestone = confirmDeleteMilestone;
     try {
@@ -86,7 +96,9 @@ export default function ProjectDetail() {
       setConfirmDeleteMilestone(null);
     }
   };
+
   const handleDeleteProject = () => setConfirmDeleteProject(true);
+
   const performDeleteProject = async () => {
     try {
       await api.delete(`/projects/${id}`);
@@ -97,6 +109,7 @@ export default function ProjectDetail() {
       setConfirmDeleteProject(false);
     }
   };
+
   if (loading) {
     return (
       <PageShell title="Loading project…">
@@ -129,12 +142,16 @@ export default function ProjectDetail() {
       </PageShell>
     );
   }
+
   const sortedMilestones = [...(project.milestones || [])].sort(
     (a, b) => new Date(a.dueDate) - new Date(b.dueDate)
   );
+
   const completedMilestones = sortedMilestones.filter((m) => m.status === 'completed').length;
+  
   const milestonePct =
     sortedMilestones.length > 0 ? Math.round((completedMilestones / sortedMilestones.length) * 100) : 0;
+    
   const tasksByMilestone = tasks.reduce((acc, t) => {
     const key = t.milestone || 'unassigned';
     if (!acc[key]) acc[key] = { total: 0, delivered: 0 };
@@ -142,7 +159,9 @@ export default function ProjectDetail() {
     if (t.status === 'delivered') acc[key].delivered += 1;
     return acc;
   }, {});
+
   const unassignedTaskCount = tasksByMilestone.unassigned?.total || 0;
+
   return (
     <PageShell
       title={project.name}

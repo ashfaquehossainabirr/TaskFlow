@@ -2,7 +2,9 @@ import StatusBadge from './StatusBadge';
 import DeadlineChip from './DeadlineChip';
 import { STATUS_LABELS } from '../utils/deadline';
 import { formatMoney, exactMoney } from '../utils/currency';
+
 const STATUS_OPTIONS = Object.keys(STATUS_LABELS);
+
 const thStyle = {
   textAlign: 'left',
   padding: '10px 16px',
@@ -13,6 +15,7 @@ const thStyle = {
   letterSpacing: '0.05em',
   borderBottom: '1px solid var(--border-hairline-soft)',
 };
+
 const tdStyle = {
   padding: '14px 16px',
   fontSize: 13.5,
@@ -20,6 +23,7 @@ const tdStyle = {
   borderBottom: '1px solid var(--border-hairline-soft)',
   verticalAlign: 'middle',
 };
+
 export default function TaskTable({
   tasks,
   isAdmin,
@@ -47,6 +51,7 @@ export default function TaskTable({
       </div>
     );
   }
+  
   return (
     <div
       style={{

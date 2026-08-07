@@ -7,6 +7,7 @@ import { ProjectStatusBadge } from '../components/ProjectStatusBadge';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
+
 export default function Projects() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function Projects() {
   const [search, setSearch] = useState('');
   const [confirmDeleteProject, setConfirmDeleteProject] = useState(null);
   const debouncedSearch = useDebounce(search, 400);
+
   const load = async () => {
     setLoading(true);
     try {
@@ -31,9 +33,11 @@ export default function Projects() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     load();
   }, [debouncedSearch]);
+
   const handleSubmit = async (form, projectId) => {
     if (projectId) {
       await api.put(`/projects/${projectId}`, form);
@@ -41,7 +45,9 @@ export default function Projects() {
       await api.post('/projects', form);
     }
   };
+
   const handleDelete = (project) => setConfirmDeleteProject(project);
+
   const performDelete = async () => {
     const project = confirmDeleteProject;
     try {
@@ -53,6 +59,7 @@ export default function Projects() {
       setConfirmDeleteProject(null);
     }
   };
+  
   return (
     <PageShell
       title="Projects"
