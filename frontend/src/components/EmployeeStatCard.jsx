@@ -1,4 +1,5 @@
 import { formatMoney, exactMoney } from '../utils/currency';
+import { formatCount, exactCount } from '../utils/formatCount';
 
 const MINI_STATS = [
   {
@@ -83,17 +84,18 @@ export default function EmployeeStatCard({ employee, onClick }) {
         <div className="esc-headline-item">
           <div
             className="esc-headline-value mono"
+            title={exactCount(employee.projects)}
             style={{
               color: 'var(--accent-cyan)',
             }}
           >
-            {employee.projects}
+            {formatCount(employee.projects)}
           </div>
           <div className="esc-headline-label">Projects</div>
         </div>
         <div className="esc-divider" />
         <div className="esc-headline-item">
-          <div className="esc-headline-value mono">{total}</div>
+          <div className="esc-headline-value mono" title={exactCount(total)}>{formatCount(total)}</div>
           <div className="esc-headline-label">Tasks</div>
         </div>
         {hasTarget && (
@@ -134,7 +136,9 @@ export default function EmployeeStatCard({ employee, onClick }) {
                   background: s.color,
                 }}
               />
-              <span className="esc-status-count mono">{employee[s.key] ?? 0}</span>
+              <span className="esc-status-count mono" title={exactCount(employee[s.key] ?? 0)}>
+                {formatCount(employee[s.key] ?? 0)}
+              </span>
               <span className="esc-status-label">{s.label}</span>
             </div>
           ))}

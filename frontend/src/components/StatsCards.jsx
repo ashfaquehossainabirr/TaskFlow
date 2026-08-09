@@ -1,3 +1,5 @@
+import { formatCount, exactCount } from '../utils/formatCount';
+
 const CARDS = [
   {
     key: 'todo',
@@ -100,6 +102,7 @@ export default function StatsCards({ stats, loading, onCardClick }) {
           </div>
           <div
             className="mono stat-card-value"
+            title={loading ? undefined : exactCount(stats?.[c.key] ?? 0)}
             style={{
               fontSize: 30,
               fontWeight: 600,
@@ -107,7 +110,7 @@ export default function StatsCards({ stats, loading, onCardClick }) {
               transition: 'color 0.18s ease',
             }}
           >
-            {loading ? '—' : (stats?.[c.key] ?? 0)}
+            {loading ? '—' : formatCount(stats?.[c.key] ?? 0)}
           </div>
         </div>
       ))}
