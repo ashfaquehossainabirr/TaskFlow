@@ -1,4 +1,5 @@
 import DonutChart from './DonutChart';
+import { formatCount, exactCount } from '../utils/formatCount';
 
 export default function TaskCompletionDonut({ stats, loading }) {
   const total = stats?.total ?? 0;
@@ -99,12 +100,13 @@ export default function TaskCompletionDonut({ stats, loading }) {
               {s.label}{' '}
               <span
                 className="mono"
+                title={exactCount(s.value)}
                 style={{
                   color: 'var(--text-primary)',
                   fontWeight: 600,
                 }}
               >
-                {s.value}
+                {formatCount(s.value)}
               </span>
             </span>
           </div>
@@ -113,13 +115,14 @@ export default function TaskCompletionDonut({ stats, loading }) {
 
       <div
         className="mono"
+        title={loading ? undefined : exactCount(total)}
         style={{
           fontSize: 13,
           color: 'var(--text-muted)',
           textAlign: 'center',
         }}
       >
-        {loading ? '—' : `${total} total task${total === 1 ? '' : 's'}`}
+        {loading ? '—' : `${formatCount(total)} total task${total === 1 ? '' : 's'}`}
       </div>
     </div>
   );

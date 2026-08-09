@@ -1,3 +1,5 @@
+import { formatCount } from '../utils/formatCount';
+
 export default function DonutChart({ segments, size = 160, thickness = 20, centerLabel, centerSubLabel }) {
   const total = segments.reduce((sum, s) => sum + s.value, 0);
   const radius = (size - thickness) / 2;
@@ -53,7 +55,7 @@ export default function DonutChart({ segments, size = 160, thickness = 20, cente
                   strokeDashoffset={offset}
                   strokeLinecap="butt"
                 >
-                  <title>{`${s.label}: ${s.value}`}</title>
+                  <title>{`${s.label}: ${formatCount(s.value)}`}</title>
                 </circle>
               );
             })}
