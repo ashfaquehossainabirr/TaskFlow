@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import PageShell from '../components/PageShell';
 import EmployeeStatCard from '../components/EmployeeStatCard';
 import EmployeeTasksModal from '../components/EmployeeTasksModal';
+import Spinner from '../components/Spinner';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
@@ -71,13 +72,8 @@ export default function EmployeeStats() {
       )}
 
       {loading && (
-        <div
-          style={{
-            color: 'var(--text-muted)',
-            fontSize: 14,
-          }}
-        >
-          Loading team stats…
+        <div style={{ padding: '48px 0' }}>
+          <Spinner label="Loading team stats…" />
         </div>
       )}
 

@@ -3,6 +3,7 @@ import PageShell from '../components/PageShell';
 import NoteModal, { NOTE_COLORS } from '../components/NoteModal';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
+import Spinner from '../components/Spinner';
 
 const colorSwatch = (color) => NOTE_COLORS.find((c) => c.value === color)?.swatch || NOTE_COLORS[0].swatch;
 
@@ -101,13 +102,8 @@ export default function Notes() {
       </div>
 
       {loading && (
-        <div
-          style={{
-            color: 'var(--text-muted)',
-            fontSize: 14,
-          }}
-        >
-          Loading notes…
+        <div style={{ padding: '48px 0' }}>
+          <Spinner label="Loading notes…" />
         </div>
       )}
 

@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { STATUS_LABELS, STATUS_ORDER } from '../utils/deadline';
 import { canManageTasks } from '../utils/roles';
+import Spinner from '../components/Spinner';
 
 const COLUMN_COLORS = {
   todo: 'var(--status-todo)',
@@ -151,13 +152,8 @@ export default function KanbanBoard() {
       </div>
 
       {loading ? (
-        <div
-          style={{
-            color: 'var(--text-muted)',
-            fontSize: 14,
-          }}
-        >
-          Loading board…
+        <div style={{ padding: '48px 0' }}>
+          <Spinner label="Loading board…" />
         </div>
       ) : (
         <div className="kanban-scroll">

@@ -8,6 +8,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import ProgressBar from '../components/ProgressBar';
 import { ProjectStatusBadge, MilestoneStatusBadge } from '../components/ProjectStatusBadge';
 import { useAuth } from '../context/AuthContext';
+import Spinner from '../components/Spinner';
 import api from '../api/axios';
 
 export default function ProjectDetail() {
@@ -113,13 +114,8 @@ export default function ProjectDetail() {
   if (loading) {
     return (
       <PageShell title="Loading project…">
-        <div
-          style={{
-            color: 'var(--text-muted)',
-            fontSize: 14,
-          }}
-        >
-          Loading…
+        <div style={{ padding: '48px 0' }}>
+          <Spinner label="Loading project…" />
         </div>
       </PageShell>
     );

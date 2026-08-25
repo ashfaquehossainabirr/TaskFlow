@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Modal from './Modal';
 import TaskTable from './TaskTable';
 import TaskDetailModal from './TaskDetailModal';
+import Spinner from './Spinner';
 import api from '../api/axios';
 
 export default function EmployeeTasksModal({ employee, onClose }) {
@@ -72,13 +73,8 @@ export default function EmployeeTasksModal({ employee, onClose }) {
       </div>
 
       {loading && (
-        <div
-          style={{
-            color: 'var(--text-muted)',
-            fontSize: 14,
-          }}
-        >
-          Loading tasks…
+        <div style={{ padding: '32px 0' }}>
+          <Spinner label="Loading tasks…" />
         </div>
       )}
 

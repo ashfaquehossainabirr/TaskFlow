@@ -5,6 +5,7 @@ import TaskDetailModal from '../components/TaskDetailModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { canManageTasks } from '../utils/roles';
+import Spinner from '../components/Spinner';
 
 export default function DeadlineWatch() {
   const { user } = useAuth();
@@ -83,14 +84,20 @@ export default function DeadlineWatch() {
           : `${tasks.length} task${tasks.length === 1 ? '' : 's'} ${isAdmin ? 'across the team' : 'assigned to you'} need attention.`}
       </div>
 
-      <TaskTable
-        tasks={tasks}
-        isAdmin={isAdmin}
-        showActions={false}
-        onStatusChange={handleStatusChange}
-        onRowClick={(task) => setDetailTaskId(task._id)}
-        emptyLabel="Nothing due within 3 days. You're clear."
-      />
+      {loading ? (
+        <div style={{ padding: '48px 0' }}>
+          <Spinner label="Loading tasks…" />
+        </div>
+      ) : (
+        <TaskTable
+          tasks={tasks}
+          isAdmin={isAdmin}
+          showActions={false}
+          onStatusChange={handleStatusChange}
+          onRowClick={(task) => setDetailTaskId(task._id)}
+          emptyLabel="Nothing due within 3 days. You're clear."
+        />
+      )}
 
       {detailTaskId && <TaskDetailModal taskId={detailTaskId} onClose={() => setDetailTaskId(null)} />}
     </PageShell>

@@ -4,6 +4,7 @@ import ConfirmModal from './ConfirmModal';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { canManageTasks } from '../utils/roles';
+import Spinner from './Spinner';
 
 const PRIORITY_STYLES = {
   normal: {
@@ -114,14 +115,8 @@ export default function NoticeBoard() {
       </div>
 
       {loading && (
-        <div
-          style={{
-            color: 'var(--text-muted)',
-            fontSize: 13.5,
-            marginTop: 12,
-          }}
-        >
-          Loading notices…
+        <div style={{ padding: '24px 0' }}>
+          <Spinner label="Loading notices…" />
         </div>
       )}
 

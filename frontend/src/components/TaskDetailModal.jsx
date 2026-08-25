@@ -3,6 +3,7 @@ import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
 import StatusBadge from './StatusBadge';
 import DeadlineChip from './DeadlineChip';
+import Spinner from './Spinner';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { useTimer } from '../context/TimerContext';
@@ -177,14 +178,8 @@ export default function TaskDetailModal({ taskId, onClose }) {
     <>
       <Modal title={loading ? 'Loading task…' : task?.title || 'Task details'} onClose={onClose} width={560}>
       {loading && (
-        <div
-          style={{
-            padding: '20px 0',
-            color: 'var(--text-muted)',
-            fontSize: 14,
-          }}
-        >
-          Loading…
+        <div style={{ padding: '32px 0' }}>
+          <Spinner label="Loading task…" />
         </div>
       )}
 
@@ -484,13 +479,8 @@ export default function TaskDetailModal({ taskId, onClose }) {
             </div>
 
             {activityLoading && (
-              <div
-                style={{
-                  fontSize: 12.5,
-                  color: 'var(--text-muted)',
-                }}
-              >
-                Loading activity…
+              <div style={{ padding: '8px 0' }}>
+                <Spinner size="sm" inline label="Loading activity…" />
               </div>
             )}
 

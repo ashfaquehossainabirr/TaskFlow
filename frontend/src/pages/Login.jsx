@@ -336,10 +336,31 @@ export default function Login() {
               fontWeight: 700,
               fontSize: 14.5,
               cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
             }}
           >
+            {loading && (
+              <span
+                className="tf-btn-spinner"
+                style={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: '50%',
+                  border: '2px solid rgba(0,0,0,0.25)',
+                  borderTopColor: 'var(--text-on-accent)',
+                  display: 'inline-block',
+                  animation: 'tf-spin 0.7s linear infinite',
+                }}
+              />
+            )}
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
+          <style>{`
+            @keyframes tf-spin { to { transform: rotate(360deg); } }
+          `}</style>
         </form>
       </div>
 

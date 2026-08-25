@@ -5,6 +5,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
+import Spinner from '../components/Spinner';
 
 const ROLE_COLORS = {
   admin: 'var(--accent-cyan)',
@@ -196,6 +197,15 @@ export default function Users() {
               </tr>
             </thead>
             <tbody>
+              {loading && (
+                <tr>
+                  <td colSpan={7} style={{ padding: '40px 16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <Spinner label="Loading users…" />
+                    </div>
+                  </td>
+                </tr>
+              )}
               {!loading && users.length === 0 && (
                 <tr>
                   <td

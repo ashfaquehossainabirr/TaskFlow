@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageShell from '../components/PageShell';
 import TaskDetailModal from '../components/TaskDetailModal';
+import Spinner from '../components/Spinner';
 import api from '../api/axios';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -184,13 +185,8 @@ export default function CalendarView() {
       </div>
 
       {loading ? (
-        <div
-          style={{
-            color: 'var(--text-muted)',
-            fontSize: 14,
-          }}
-        >
-          Loading calendar…
+        <div style={{ padding: '48px 0' }}>
+          <Spinner label="Loading calendar…" />
         </div>
       ) : (
         <div className="cal-grid">
@@ -250,6 +246,21 @@ export default function CalendarView() {
                     </button>
                   )}
                 </div>
+                {events.length > 0 && (
+                  <button
+                    className="cal-day-summary"
+                    onClick={() =>
+                      setDayModal({
+                        day,
+                        events,
+                      })
+                    }
+                    aria-label={`${events.length} event${events.length === 1 ? '' : 's'} on ${day.getDate()}`}
+                  >
+                    <span className="cal-day-summary-dot" />
+                    {events.length}
+                  </button>
+                )}
               </div>
             );
           })}
@@ -336,11 +347,39 @@ export default function CalendarView() {
           cursor: pointer;
           padding: 2px 6px;
         }
+        .cal-day-summary {
+          display: none;
+        }
         @media (max-width: 720px) {
           .cal-grid { grid-template-columns: repeat(7, minmax(38px, 1fr)); }
-          .cal-day { min-height: 64px; padding: 4px; }
-          .cal-event { display: none; }
-          .cal-more { display: block; }
+          .cal-day { min-height: 56px; padding: 4px 2px; gap: 3px; }
+          .cal-day-events { display: none; }
+          .cal-weekday { padding: 8px 2px; font-size: 9.5px; }
+          .cal-day-summary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 1px 0;
+            font-family: var(--font-mono);
+          }
+          .cal-day-summary-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            flex-shrink: 0;
+          }
+        }
+        @media (max-width: 420px) {
+          .cal-day { min-height: 46px; }
+          .cal-day-number { font-size: 11px; }
         }
       `}</style>
 

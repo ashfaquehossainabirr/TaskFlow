@@ -7,6 +7,7 @@ import { ProjectStatusBadge } from '../components/ProjectStatusBadge';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import useDebounce from '../hooks/useDebounce';
+import Spinner from '../components/Spinner';
 
 export default function Projects() {
   const { user } = useAuth();
@@ -110,13 +111,8 @@ export default function Projects() {
       </div>
 
       {loading && (
-        <div
-          style={{
-            color: 'var(--text-muted)',
-            fontSize: 14,
-          }}
-        >
-          Loading projects…
+        <div style={{ padding: '48px 0' }}>
+          <Spinner label="Loading projects…" />
         </div>
       )}
 

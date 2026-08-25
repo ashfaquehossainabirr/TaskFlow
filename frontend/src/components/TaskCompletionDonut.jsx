@@ -1,4 +1,5 @@
 import DonutChart from './DonutChart';
+import Spinner from './Spinner';
 import { formatCount, exactCount } from '../utils/formatCount';
 
 export default function TaskCompletionDonut({ stats, loading }) {
@@ -55,11 +56,9 @@ export default function TaskCompletionDonut({ stats, loading }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--text-muted)',
-            fontSize: 13,
           }}
         >
-          Loading…
+          <Spinner />
         </div>
       ) : (
         <DonutChart segments={segments} size={160} thickness={22} />

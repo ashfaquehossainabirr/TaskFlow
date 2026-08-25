@@ -9,6 +9,7 @@ import api from '../api/axios';
 import { STATUS_LABELS } from '../utils/deadline';
 import { canManageTasks } from '../utils/roles';
 import useDebounce from '../hooks/useDebounce';
+import Spinner from '../components/Spinner';
 
 export default function Tasks() {
   const { user } = useAuth();
@@ -221,19 +222,25 @@ export default function Tasks() {
         </select>
       </div>
 
-      <TaskTable
-        tasks={tasks}
-        isAdmin={isManager}
-        onStatusChange={handleStatusChange}
-        onEdit={(task) => {
-          setEditingTask(task);
-          setShowForm(true);
-        }}
-        onDelete={handleDelete}
-        deletingId={deletingId}
-        onRowClick={(task) => setDetailTaskId(task._id)}
-        emptyLabel={loading ? 'Loading tasks…' : 'No tasks match your filters.'}
-      />
+      {loading ? (
+        <div style={{ padding: '48px 0' }}>
+          <Spinner label="Loading tasks…" />
+        </div>
+      ) : (
+        <TaskTable
+          tasks={tasks}
+          isAdmin={isManager}
+          onStatusChange={handleStatusChange}
+          onEdit={(task) => {
+            setEditingTask(task);
+            setShowForm(true);
+          }}
+          onDelete={handleDelete}
+          deletingId={deletingId}
+          onRowClick={(task) => setDetailTaskId(task._id)}
+          emptyLabel="No tasks match your filters."
+        />
+      )}
 
       {showForm && (
         <TaskFormModal
