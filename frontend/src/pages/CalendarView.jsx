@@ -381,11 +381,38 @@ export default function CalendarView() {
           .cal-day { min-height: 46px; }
           .cal-day-number { font-size: 11px; }
         }
+        @keyframes cal-modal-overlay-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes cal-modal-box-in {
+          from {
+            opacity: 0;
+            transform: translateY(18px) scale(0.97);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .cal-day-modal-overlay {
+          animation: cal-modal-overlay-in 0.2s ease both;
+        }
+        .cal-day-modal-box {
+          animation: cal-modal-box-in 0.28s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .cal-day-modal-overlay,
+          .cal-day-modal-box {
+            animation-duration: 0.001ms !important;
+          }
+        }
       `}</style>
 
       {dayModal && (
         <div
           onClick={() => setDayModal(null)}
+          className="cal-day-modal-overlay"
           style={{
             position: 'fixed',
             inset: 0,
@@ -399,6 +426,7 @@ export default function CalendarView() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
+            className="cal-day-modal-box"
             style={{
               background: 'var(--bg-panel-raised)',
               border: '1px solid var(--border-hairline)',

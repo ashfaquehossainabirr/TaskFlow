@@ -2,6 +2,7 @@ export default function Modal({ title, onClose, children, width = 480 }) {
   return (
     <div
       onClick={onClose}
+      className="app-modal-overlay"
       style={{
         position: 'fixed',
         inset: 0,
@@ -74,6 +75,33 @@ export default function Modal({ title, onClose, children, width = 480 }) {
       <style>{`
         [data-theme='light'] .app-modal-box {
           background: var(--bg-panel) !important;
+        }
+
+        @keyframes app-modal-overlay-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes app-modal-box-in {
+          from {
+            opacity: 0;
+            transform: translateY(18px) scale(0.97);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .app-modal-overlay {
+          animation: app-modal-overlay-in 0.2s ease both;
+        }
+        .app-modal-box {
+          animation: app-modal-box-in 0.28s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .app-modal-overlay,
+          .app-modal-box {
+            animation-duration: 0.001ms !important;
+          }
         }
       `}</style>
     </div>
