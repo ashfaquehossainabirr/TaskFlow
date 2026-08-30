@@ -31,7 +31,6 @@ export default function Spinner({ size = 'md', label, fullpage = false, inline =
   // app never dips back into a generic spinner once it's already loaded.
   const brandedMark = (
     <div className="tf-brand-mark" aria-hidden="true">
-      <span className="tf-brand-glow" />
       <span className="tf-brand-ring" />
       <span className="tf-brand-ring tf-brand-ring--2" />
       <span className="tf-brand-logo">T</span>
@@ -47,6 +46,7 @@ export default function Spinner({ size = 'md', label, fullpage = false, inline =
     <div className="tf-spinner-stack">
       {brandedMark}
       <span className="tf-brand-word">TaskFlow</span>
+      <span className="tf-brand-bar"><span /></span>
       {label && <span className="tf-spinner-label">{label}</span>}
     </div>
   ) : (
@@ -72,11 +72,12 @@ export default function Spinner({ size = 'md', label, fullpage = false, inline =
           to { transform: rotate(360deg); }
         }
         .tf-spinner-stack {
+          position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 14px;
+          gap: 18px;
         }
         .tf-spinner-inline {
           display: inline-flex;
@@ -101,19 +102,11 @@ export default function Spinner({ size = 'md', label, fullpage = false, inline =
         }
         .tf-brand-mark {
           position: relative;
-          width: 56px;
-          height: 56px;
+          width: 64px;
+          height: 64px;
           display: flex;
           align-items: center;
           justify-content: center;
-        }
-        .tf-brand-glow {
-          position: absolute;
-          inset: -22px;
-          border-radius: 50%;
-          background: radial-gradient(circle, var(--accent-cyan-dim), transparent 70%);
-          opacity: 0.7;
-          animation: tf-brand-breathe 2.6s ease-in-out infinite;
         }
         .tf-brand-ring {
           position: absolute;
@@ -125,7 +118,7 @@ export default function Spinner({ size = 'md', label, fullpage = false, inline =
           animation: tf-spin 1.1s cubic-bezier(0.6, 0.1, 0.4, 0.9) infinite;
         }
         .tf-brand-ring--2 {
-          inset: -9px;
+          inset: -10px;
           border-top-color: transparent;
           border-right-color: transparent;
           border-bottom-color: var(--status-progress);
@@ -135,36 +128,51 @@ export default function Spinner({ size = 'md', label, fullpage = false, inline =
         }
         .tf-brand-logo {
           position: relative;
-          width: 32px;
-          height: 32px;
-          border-radius: 9px;
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
           background: linear-gradient(135deg, var(--accent-cyan), var(--status-progress));
           display: flex;
           align-items: center;
           justify-content: center;
           font-family: var(--font-mono);
           font-weight: 700;
-          font-size: 15px;
+          font-size: 17px;
           color: var(--text-on-accent);
-          box-shadow: 0 0 20px -4px var(--accent-cyan);
           animation: tf-brand-pulse 1.8s ease-in-out infinite;
         }
         .tf-brand-word {
           font-family: var(--font-display);
           font-weight: 700;
-          font-size: 17px;
-          letter-spacing: -0.01em;
+          font-size: 19px;
+          letter-spacing: 0.01em;
           color: var(--text-primary);
           opacity: 0;
-          animation: tf-boot-word-in 0.5s ease 0.1s forwards;
+          animation: tf-boot-word-in 0.6s ease 0.15s forwards;
+        }
+        .tf-brand-bar {
+          display: block;
+          width: 120px;
+          height: 3px;
+          border-radius: 3px;
+          background: var(--border-hairline-soft);
+          overflow: hidden;
+        }
+        .tf-brand-bar span {
+          display: block;
+          height: 100%;
+          width: 40%;
+          border-radius: 3px;
+          background: linear-gradient(90deg, var(--accent-cyan), var(--status-progress));
+          animation: tf-brand-bar-sweep 1.15s ease-in-out infinite;
+        }
+        @keyframes tf-brand-bar-sweep {
+          0% { transform: translateX(-120%); }
+          100% { transform: translateX(340%); }
         }
         @keyframes tf-brand-pulse {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.08); }
-        }
-        @keyframes tf-brand-breathe {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50% { opacity: 0.9; transform: scale(1.1); }
         }
         @keyframes tf-boot-word-in {
           from { opacity: 0; transform: translateY(6px); }
@@ -177,8 +185,8 @@ export default function Spinner({ size = 'md', label, fullpage = false, inline =
         @media (prefers-reduced-motion: reduce) {
           .tf-spinner,
           .tf-brand-ring,
-          .tf-brand-glow,
-          .tf-brand-logo {
+          .tf-brand-logo,
+          .tf-brand-bar span {
             animation-duration: 1.8s;
           }
           .tf-spinner-fullpage {

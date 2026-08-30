@@ -32,7 +32,6 @@
     <div id="root"></div>
 
     <div id="tf-boot" aria-hidden="true">
-      <div class="tf-boot-glow"></div>
       <div class="tf-boot-mark">
         <span class="tf-boot-ring"></span>
         <span class="tf-boot-ring tf-boot-ring--2"></span>
@@ -49,7 +48,6 @@
         --tf-blue: #4a9eff;
         --tf-blue-dim: rgba(74, 158, 255, 0.55);
         --tf-blue-faint: rgba(74, 158, 255, 0.15);
-        --tf-glow: rgba(79, 216, 224, 0.16);
         --tf-logo-text: #0b1017;
         --tf-bar-track: rgba(148, 167, 184, 0.2);
 
@@ -79,18 +77,8 @@
         --tf-blue: #2f6fd6;
         --tf-blue-dim: rgba(47, 111, 214, 0.6);
         --tf-blue-faint: rgba(47, 111, 214, 0.2);
-        --tf-glow: rgba(8, 145, 163, 0.14);
         --tf-logo-text: #ffffff;
         --tf-bar-track: rgba(77, 92, 106, 0.18);
-      }
-      .tf-boot-glow {
-        position: absolute;
-        width: min(70vw, 520px);
-        height: min(70vw, 520px);
-        border-radius: 50%;
-        background: radial-gradient(circle, var(--tf-glow), transparent 70%);
-        filter: blur(10px);
-        animation: tf-boot-breathe 2.6s ease-in-out infinite;
       }
       .tf-boot-mark {
         position: relative;
@@ -170,10 +158,6 @@
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.08); }
       }
-      @keyframes tf-boot-breathe {
-        0%, 100% { opacity: 0.6; transform: scale(1); }
-        50% { opacity: 1; transform: scale(1.08); }
-      }
       @keyframes tf-boot-word-in {
         from { opacity: 0; transform: translateY(6px); }
         to { opacity: 1; transform: translateY(0); }
@@ -183,7 +167,6 @@
         100% { transform: translateX(340%); }
       }
       @media (prefers-reduced-motion: reduce) {
-        .tf-boot-glow,
         .tf-boot-ring,
         .tf-boot-logo,
         .tf-boot-bar span {

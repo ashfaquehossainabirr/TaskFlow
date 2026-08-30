@@ -6,7 +6,7 @@ export default function ProtectedRoute({ children, adminOnly = false, allowedRol
   const { user, loading } = useAuth();
   
   if (loading) {
-    return <Spinner fullpage size="lg" label="Loading TaskFlow…" />;
+    return <Spinner fullpage size="lg" label="Loading Dashboard" />;
   }
   if (!user) return <Navigate to="/login" replace />;
   if (adminOnly && user.role !== 'admin') return <Navigate to="/" replace />;
