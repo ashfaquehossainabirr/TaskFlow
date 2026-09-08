@@ -1,5 +1,7 @@
+import { createPortal } from 'react-dom';
+
 export default function Modal({ title, onClose, children, width = 480 }) {
-  return (
+  return createPortal(
     <div
       onClick={onClose}
       className="app-modal-overlay"
@@ -104,6 +106,7 @@ export default function Modal({ title, onClose, children, width = 480 }) {
           }
         }
       `}</style>
-    </div>
+    </div>,
+    document.body
   );
 }
